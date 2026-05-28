@@ -438,8 +438,8 @@
       "meridian_code": "ST",
       "location_rule": {
         "method": "face_mesh",
-        "face_indices": [145],
-        "description": "瞳孔直下，眼球与眶下缘之间(左)"
+        "face_indices": [152],
+        "description": "瞳孔直下，眼球与眶下缘之间(左) - 使用眶下脸颊区域landmark"
       },
       "clinical": {
         "functions": ["疏风清热", "明目止痛"],
@@ -457,8 +457,8 @@
       "meridian_code": "ST",
       "location_rule": {
         "method": "face_mesh",
-        "face_indices": [374],
-        "description": "瞳孔直下，眼球与眶下缘之间(右)"
+        "face_indices": [379],
+        "description": "瞳孔直下，眼球与眶下缘之间(右) - 使用眶下脸颊区域landmark"
       },
       "clinical": {
         "functions": ["疏风清热", "明目止痛"],

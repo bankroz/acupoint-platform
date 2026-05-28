@@ -65,7 +65,7 @@ def _put_chinese_text(img_bgr, text, position, color, font_size=20):
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.pose_extractor import PoseExtractor, ModelMode
+from core.pose_extractor import PoseExtractor, ModelMode, PoseResult
 from core.spine_estimator import SpineEstimator
 from core.acupoint_locator import AcupointLocator
 from core.population_adapter import PopulationAdapter, PopulationProfile, Gender
@@ -676,10 +676,13 @@ def live_detection_preview(camera_id: int):
         # ── 右侧状态面板 ──
         panel_x = w - 200
         panel_y = 20
+        # 注意：画面经 cv2.flip 镜像，MediaPipe 在镜像图里会颠倒左右手标签
+        # left_hand_landmarks 实际是用户的右手，right_hand_landmarks 是用户的左手
+        # 面板显示解剖学左右：L-Hand=用户的左手, R-Hand=用户的右手
         panel_items = [
             ("Face   ", face_ok),
-            ("L-Hand ", left_ok),
-            ("R-Hand ", right_ok),
+            ("L-Hand ", right_ok),
+            ("R-Hand ", left_ok),
             ("Pose   ", pose_ok),
         ]
         for i, (label, ok) in enumerate(panel_items):
@@ -1086,7 +1089,7 @@ def run_detection_pipeline(image, profile: Optional[PopulationProfile] = None):
 
     # 4. Acupoint localization
     print("\n[Step 3] Acupoint localization...")
-    locator = AcupointLocator(profile=profile)
+    locator = AcupointLocator(profile=profile, hand_flip_correction=False)
     locator.load_database([
         "database/acupoints_torso.json",
         "database/acupoints_limbs.json",
@@ -1214,6 +1217,9 @@ def live_face_hands_acupoints(camera_id: int,
     print("  Controls: [Q] Quit  [S] Screenshot  [G] Grade Filter\n")
     print("  Place your face and hands in front of the camera")
 
+    # ── 手部朝向检测器（轻量实例，仅用于方向判定）──
+    _hand_ori_detector = AcupointLocator()
+
     # ── 计算人群适配系数 ──
     _adapter = PopulationAdapter()
     coeffs = _adapter.get_coefficients("default", profile) if profile \
@@ -1289,10 +1295,12 @@ def live_face_hands_acupoints(camera_id: int,
 
             # ── 手部检测 ──
             # 注意：画面经过 cv2.flip 水平镜像，MediaPipe 的解剖学左右
-            # 与屏幕视觉左右相反，因此 HUD 标签需交换显示
+            # 与屏幕视觉左右相反，因此 HUD 标签需交换显示。
+            # 同时交换手部数据源：right_hand_landmarks ↔ left_hand_landmarks
+            # 以纠正 MediaPipe 在镜像输入下的左右手标签颠倒问题。
             for hand_side, hand_lms_attr, color, side_label in [
-                ("left", "left_hand_landmarks", COLOR_HAND, "Right"),
-                ("right", "right_hand_landmarks", (255, 150, 50), "Left"),
+                ("left", "right_hand_landmarks", COLOR_HAND, "Right"),
+                ("right", "left_hand_landmarks", (255, 150, 50), "Left"),
             ]:
                 hlms = _unwrap_landmarks(getattr(result, hand_lms_attr, None))
                 if hlms:
@@ -1310,12 +1318,21 @@ def live_face_hands_acupoints(camera_id: int,
                         r = 5 if i in (4, 8, 12, 16, 20) else 3
                         cv2.circle(display, p, r, (50, 255, 50) if hand_side == "left" else (255, 180, 50), -1)
 
+                    # 检测当前手掌朝向（掌心/掌背），用于过滤朝向不匹配的穴位
+                    hlms_np = np.array([[lm.x, lm.y, lm.z] for lm in hlms])
+                    hand_ori = _hand_ori_detector.detect_hand_orientation(hlms_np)
+
                     # 计算手部穴位2D位置（使用统一的 AcupointLocator 穴位定义，含左右手镜像）
                     for ap_id, ap in hand_defs.items():
                         rule = ap.get("location_rule", {})
                         ap_side = rule.get("hand_side", "right")
                         if ap_side != hand_side:
                             continue
+                        # 朝向检查：手背/掌心朝向不匹配时跳过该穴位
+                        valid_ori = ap.get("valid_orientation")
+                        if valid_ori is not None:
+                            if hand_ori is None or valid_ori != hand_ori:
+                                continue
                         lm_idx = rule.get("hand_landmark_index")
                         if lm_idx is None or lm_idx >= len(hlms):
                             continue
@@ -1359,9 +1376,10 @@ def live_face_hands_acupoints(camera_id: int,
         # ── 右侧状态面板 ──
         panel_x = w - 200
         panel_y = 20
-        # 注意：画面已镜像，状态面板左右也需交换
+        # 数据源层已交换过：right_hand_landmarks→left_ok, left_hand_landmarks→right_ok
+        # left_ok=用户左手, right_ok=用户右手（已纠正），面板直接映射即可
         for i, (label, ok) in enumerate([
-            ("Face    ", face_ok), ("L-Hand  ", right_ok), ("R-Hand  ", left_ok),
+            ("Face    ", face_ok), ("L-Hand  ", left_ok), ("R-Hand  ", right_ok),
         ]):
             y = panel_y + i * 30
             color = COLOR_OK if ok else COLOR_OFF
@@ -1422,6 +1440,344 @@ def live_face_hands_acupoints(camera_id: int,
     cap.release()
     cv2.destroyAllWindows()
     print(f"\n  Face+Hands mode ended.\n")
+
+
+# ── 全身实时穴位定位模式 ──────────────────────────────────
+
+def live_full_body_acupoints(camera_id: int,
+                             profile: Optional[PopulationProfile] = None):
+    """
+    全身实时穴位检测模式（面部 + 躯干 + 四肢 + 手部）。
+
+    使用 Holistic Landmarker 一次性获取 Pose + Face Mesh + Hands，
+    转换为 PoseResult 后调用 AcupointLocator.locate() 运行完整管线，
+    在视频画面上实时标注所有 4 个区域的穴位。
+
+    - 面部：20个穴位（印堂、太阳、睛明...）
+    - 躯干：任脉/督脉/膀胱经/胃经等
+    - 四肢：手三阴/三阳经 + 足三阴/三阳经
+    - 手部：12种穴位（镜像24个）
+
+    按键：
+      Q = 退出
+      S = 截图保存
+      G = 循环切换精度过滤 (A→B→C→D→ALL)
+      1-4 = 直接选择精度等级
+    """
+    from mediapipe.tasks.python import vision, BaseOptions
+    from mediapipe.tasks.python.vision import RunningMode
+    from mediapipe import Image as MPImage, ImageFormat
+
+    model_path = os.path.join("models", "holistic_landmarker.task")
+    if not os.path.exists(model_path):
+        print("\n[!] Holistic model not found!")
+        print("  Please place holistic_landmarker.task in models/ directory")
+        print("  Run: python scripts/download_models.py")
+        return
+
+    # ── 初始化穴位定位器，加载全部 4 个数据库 ──
+    locator = AcupointLocator(profile=profile)
+    locator.load_database([
+        "database/acupoints_torso.json",
+        "database/acupoints_limbs.json",
+        "database/acupoints_face.json",
+        "database/acupoints_hands.json",
+    ])
+    total_defs = locator.get_acupoint_count()
+    print(f"\n  Loaded {total_defs} acupoint definitions "
+          f"(torso + limbs + face + hands)")
+
+    # ── 打开摄像头 ──
+    cap = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    cap.set(cv2.CAP_PROP_FPS, 30)
+    if not cap.isOpened():
+        cap = cv2.VideoCapture(camera_id)
+        if not cap.isOpened():
+            print(f"[!] Cannot open camera #{camera_id}")
+            return
+
+    # ── 创建 Holistic Landmarker ──
+    base = BaseOptions(model_asset_path=model_path)
+    opts = vision.HolisticLandmarkerOptions(
+        base_options=base,
+        running_mode=RunningMode.VIDEO,
+        min_face_detection_confidence=0.5,
+        min_face_landmarks_confidence=0.5,
+        min_pose_detection_confidence=0.3,
+        min_pose_landmarks_confidence=0.3,
+        min_hand_landmarks_confidence=0.5,
+        output_face_blendshapes=False,
+        output_segmentation_mask=False,
+    )
+    landmarker = vision.HolisticLandmarker.create_from_options(opts)
+
+    # ── 状态变量 ──
+    show_pose = True
+    grade_filter = "D"
+    grade_order = {"A": 0, "B": 1, "C": 2, "D": 3}
+
+    # ── 人群适配 ──
+    _adapter = PopulationAdapter()
+    coeffs = _adapter.get_coefficients("default", profile) if profile \
+        else _adapter.get_coefficients("default", PopulationProfile())
+
+    print("\n  [Full Body Acupoint Mode]")
+    print("  Controls: [Q] Quit  [S] Screenshot  [G] Grade Filter  "
+          "[1-4] Set Grade")
+    if profile:
+        print(f"  [Profile] {_format_profile_hud(profile)}")
+    print("  Stand in front of the camera with whole body visible\n")
+
+    while True:
+        ret, frame_bgr = cap.read()
+        if not ret or frame_bgr is None:
+            continue
+
+        frame_bgr = cv2.flip(frame_bgr, 1)
+        h, w = frame_bgr.shape[:2]
+        display = frame_bgr.copy()
+        frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
+        mp_image = MPImage(image_format=ImageFormat.SRGB, data=frame_rgb)
+
+        # ── Holistic 推理 ──
+        t0 = time.time()
+        frame_ms = int(time.time() * 1000)
+        result = landmarker.detect_for_video(mp_image, frame_ms)
+        latency = (time.time() - t0) * 1000
+
+        face_ok = False
+        left_ok = False
+        right_ok = False
+        pose_ok = False
+        all_acupoints = []
+        orientation = "unknown"
+
+        if result is not None:
+            # ── 绘制骨骼 ──
+            # 1. 面部网格
+            f_lms = _unwrap_landmarks(getattr(result, 'face_landmarks', None))
+            if f_lms:
+                face_ok = True
+                pts = [(int(lm.x * w), int(lm.y * h)) for lm in f_lms]
+                for i in range(17):
+                    j = (i + 1) % 17
+                    cv2.line(display, pts[i], pts[j], COLOR_FACE, 1, cv2.LINE_AA)
+                for idx in [63, 105, 66, 107, 55, 296, 334, 293, 336, 285]:
+                    if idx < len(pts):
+                        cv2.circle(display, pts[idx], 1, COLOR_FACE, -1)
+                for idx, r, c in [(159, 3, (255,255,255)), (386, 3, (255,255,255)),
+                                  (1, 4, (50,200,255)), (61, 2, (200,150,200)),
+                                  (291, 2, (200,150,200))]:
+                    if idx < len(pts):
+                        cv2.circle(display, pts[idx], r, c, -1)
+
+            # 2. 手部骨架
+            for hand_side, attr, color, side_label in [
+                ("left", "left_hand_landmarks", COLOR_HAND, "Left"),
+                ("right", "right_hand_landmarks", (255, 150, 50), "Right"),
+            ]:
+                h_lms = _unwrap_landmarks(getattr(result, attr, None))
+                if h_lms:
+                    if hand_side == "left":
+                        left_ok = True
+                    else:
+                        right_ok = True
+                    pts = [(int(lm.x * w), int(lm.y * h)) for lm in h_lms]
+                    for (a, b) in HAND_CONNECTIONS:
+                        if a < len(pts) and b < len(pts):
+                            cv2.line(display, pts[a], pts[b], color, 2, cv2.LINE_AA)
+                    for i, p in enumerate(pts):
+                        r = 5 if i in (4,8,12,16,20) else 3
+                        c2 = (50,255,50) if hand_side == "left" else (255,180,50)
+                        cv2.circle(display, p, r, c2, -1)
+
+            # 3. 姿态骨架
+            p_lms = _unwrap_landmarks(getattr(result, 'pose_landmarks', None))
+            if p_lms and show_pose:
+                pose_ok = True
+                pts = [(int(lm.x * w), int(lm.y * h)) for lm in p_lms]
+                for (a, b) in POSE_CONNECTIONS:
+                    if a < len(pts) and b < len(pts):
+                        cv2.line(display, pts[a], pts[b], COLOR_POSE, 3, cv2.LINE_AA)
+                for i, p in enumerate(pts):
+                    if i < len(p_lms):
+                        vis = getattr(p_lms[i], 'visibility', 1.0)
+                        if vis > 0.5:
+                            r = 6 if i in (0,7,8,11,12,23,24) else 4
+                            cv2.circle(display, p, r, (255,220,100), -1)
+
+            # 4. 躯干朝向指示
+            if p_lms and len(p_lms) >= 25:
+                pose_np = np.array([
+                    [lm.x, lm.y, lm.z,
+                     getattr(lm, 'visibility', 1.0)]
+                    for lm in p_lms
+                ])
+                draw_body_indicators(display, pose_np,
+                                     orientation=None, has_face=face_ok)
+
+            # ── 构建 PoseResult 并运行穴位定位 ──
+            if p_lms and len(p_lms) >= 25:
+                pose_result_local = PoseResult()
+                pose_result_local.has_pose = True
+                pose_result_local.image_shape = (w, h)
+                pose_result_local.has_face = face_ok
+                pose_result_local.has_left_hand = left_ok
+                pose_result_local.has_right_hand = right_ok
+
+                # Pose landmarks
+                pose_result_local.pose_landmarks = np.array([
+                    [lm.x, lm.y, lm.z, getattr(lm, 'visibility', 1.0)]
+                    for lm in p_lms
+                ])
+
+                # Pose world landmarks
+                wlms = _unwrap_landmarks(
+                    getattr(result, 'pose_world_landmarks', None))
+                if wlms:
+                    pose_result_local.pose_world_landmarks = np.array([
+                        [lm.x, lm.y, lm.z, getattr(lm, 'visibility', 1.0)]
+                        for lm in wlms
+                    ])
+
+                # Face landmarks
+                if f_lms:
+                    pose_result_local.face_landmarks = np.array([
+                        [lm.x, lm.y, lm.z] for lm in f_lms
+                    ])
+
+                # Hand landmarks
+                for side, attr_name, setter in [
+                    ("left", "left_hand_landmarks", "left_hand_landmarks"),
+                    ("right", "right_hand_landmarks", "right_hand_landmarks"),
+                ]:
+                    hl = _unwrap_landmarks(getattr(result, attr_name, None))
+                    if hl:
+                        arr = np.array([[lm.x, lm.y, lm.z] for lm in hl])
+                        setattr(pose_result_local, setter, arr)
+
+                # 运行穴位定位管线
+                try:
+                    acu_result = locator.locate(pose_result_local)
+                    if acu_result and acu_result.acupoints:
+                        all_acupoints = acu_result.acupoints
+                        orientation = getattr(locator, '_cached_body_orientation',
+                                              "unknown")
+                except Exception as e:
+                    pass  # 单帧定位失败不中断
+
+        # ── 绘制穴位标记 ──
+        visible_count = 0
+        for ap in all_acupoints:
+            grade = getattr(ap, 'grade', 'B')
+            if grade_order.get(grade, 9) > grade_order.get(grade_filter, 9):
+                continue
+            if ap.position_2d is None:
+                continue
+            px, py = int(ap.position_2d[0]), int(ap.position_2d[1])
+            mc = getattr(ap, 'meridian_code', 'EX')
+            color = MERIDIAN_BGR.get(mc, (0, 255, 255))
+            radius = 10 if grade == "A" else 8 if grade == "B" else 6 if grade == "C" else 4
+
+            # 类型识别
+            is_face = hasattr(ap, 'reference_landmarks') and grade in ("A", "B") and mc in ("GV", "BL", "ST", "GB", "TE", "EX")
+            is_hand = mc in ("LU", "HT", "PC", "LI", "SI", "TE") and radius >= 6
+
+            cv2.circle(display, (px, py), radius + 2, (0, 0, 0), 1)
+            cv2.circle(display, (px, py), radius, color, -1)
+            cv2.circle(display, (px, py), radius, (255, 255, 255), 1)
+
+            # 标注文字（只显示高精度穴位名称，避免画面太乱）
+            name = getattr(ap, 'name_cn', '')
+            if name and grade in ("A", "B"):
+                if is_hand:
+                    # 画面经 cv2.flip 镜像：屏幕左=右手、屏幕右=左手
+                    side = "R" if px < w // 2 else "L"
+                    name = f"{name}({side})"
+                _put_chinese_text(display, name,
+                                  (px - len(name) * 5 // 2, py - radius - 8),
+                                  color, font_size=13)
+            visible_count += 1
+
+        # ── 右侧状态面板 ──
+        panel_x = w - 200
+        panel_y = 20
+        # 注意：画面经 cv2.flip 镜像，MediaPipe 在镜像图里会颠倒左右手标签
+        # left_hand_landmarks 实际是用户的右手，right_hand_landmarks 是用户的左手
+        # 面板显示解剖学左右：L-Hand=用户的左手, R-Hand=用户的右手
+        panel_items = [
+            ("Face   ", face_ok), ("L-Hand ", right_ok),
+            ("R-Hand ", left_ok), ("Pose   ", pose_ok),
+            ("Orient ", orientation if orientation != "unknown" else "----"),
+        ]
+        for i, (label, ok) in enumerate(panel_items):
+            y = panel_y + i * 30
+            if isinstance(ok, bool):
+                color = COLOR_OK if ok else COLOR_OFF
+                cv2.putText(display, label, (panel_x, y + 22),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1, cv2.LINE_AA)
+                cv2.circle(display, (panel_x - 10, y + 17), 6, color, -1 if ok else 1)
+            else:
+                # orientation 字符串
+                o_color = (100,255,255) if ok == "front" else (255,200,100) if ok == "back" else COLOR_OFF
+                cv2.putText(display, f"Orient: {ok}", (panel_x, y + 22),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.55, o_color, 1, cv2.LINE_AA)
+                cv2.circle(display, (panel_x - 10, y + 17), 6, o_color, -1)
+
+        # 穴位计数
+        cv2.putText(display, f"Points: {visible_count}",
+                   (panel_x, panel_y + 155),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.55,
+                   COLOR_OK if visible_count > 0 else COLOR_OFF, 1, cv2.LINE_AA)
+
+        # Grade 信息
+        cv2.putText(display, f"Grade: >={grade_filter}",
+                   (panel_x, panel_y + 180),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1, cv2.LINE_AA)
+
+        # ── 顶部 HUD ──
+        fps = 1000 / latency if latency > 0 else 0
+        mode_label = "Full Body Mode"
+        cv2.putText(display,
+            f"{mode_label} | FPS:{fps:.0f} | {latency:.0f}ms | "
+            f"Grade:{grade_filter} | Q=Quit S=Shot G=Filter 1-4=Grade",
+            (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 255), 1, cv2.LINE_AA)
+
+        # ── 底部提示 ──
+        cv2.putText(display, "Stand whole body in frame for full acupoint detection",
+                   (10, h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (160, 160, 160), 1, cv2.LINE_AA)
+
+        cv2.imshow('perfess mediapipe test', display)
+
+        # ── 按键处理 ──
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q') or key == ord('Q'):
+            break
+        elif key == ord('s') or key == ord('S'):
+            os.makedirs("output/screenshots", exist_ok=True)
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            fname = f"output/screenshots/full_body_{ts}.png"
+            cv2.imwrite(fname, display)
+            print(f"  [Screenshot] {fname}")
+        elif key == ord('g') or key == ord('G'):
+            grades = ["A", "B", "C", "D"]
+            try:
+                idx = grades.index(grade_filter)
+                grade_filter = grades[(idx + 1) % len(grades)]
+            except ValueError:
+                grade_filter = "D"
+            print(f"  Grade filter: {grade_filter}")
+        elif key in (ord('1'), ord('2'), ord('3'), ord('4')):
+            grade_map = {ord('1'): "A", ord('2'): "B", ord('3'): "C", ord('4'): "D"}
+            grade_filter = grade_map[key]
+            print(f"  Grade filter: {grade_filter}")
+
+    landmarker.close()
+    cap.release()
+    cv2.destroyAllWindows()
+    print(f"\n  Full Body mode ended.\n")
 
 
 # ── 图片模式引导界面 ───────────────────────────────────────
@@ -1501,49 +1857,70 @@ def main():
     # ── 选择检测来源和质量 ──
     image_path = "input/images/test.jpg"
     has_existing = os.path.exists(image_path)
+    use_image = False
+    face_hands_only = False
+    full_body_only = False
 
     if has_existing:
         print("=" * 50)
         print("  Choose detection mode:")
-        print("    [1] Use existing image: input/images/test.jpg (full body)")
-        print("    [2] Use camera - live capture (full body)")
-        print("    [3] Face + Hands only (real-time)")
+        print("    [1] Image: {0} (full body)".format(
+            "input/images/test.jpg"))
+        print("    [2] Camera - live preview (skeleton only)")
+        print("    [3] Face + Hands real-time acupoints")
+        print("    [4] Full Body real-time acupoints (face+torso+limbs+hands)")
         print("=" * 50)
         while True:
-            choice = input("  Enter 1, 2 or 3: ").strip()
+            choice = input("  Enter 1, 2, 3 or 4: ").strip()
             if choice == "1":
                 use_image = True
                 face_hands_only = False
+                full_body_only = False
                 break
             elif choice == "2":
                 use_image = False
                 face_hands_only = False
+                full_body_only = False
                 break
             elif choice == "3":
                 use_image = False
                 face_hands_only = True
+                full_body_only = False
+                break
+            elif choice == "4":
+                use_image = False
+                face_hands_only = False
+                full_body_only = True
                 break
             else:
-                print("  [!] Invalid input, please enter 1, 2 or 3")
+                print("  [!] Invalid input, please enter 1, 2, 3 or 4")
     else:
         print("  No existing image found.")
         print("=" * 50)
         print("  Choose detection mode:")
-        print("    [1] Use camera - live capture (full body)")
-        print("    [2] Face + Hands only (real-time)")
+        print("    [1] Camera - live preview (skeleton only)")
+        print("    [2] Face + Hands real-time acupoints")
+        print("    [3] Full Body real-time acupoints (face+torso+limbs+hands)")
         print("=" * 50)
         while True:
-            choice = input("  Enter 1 or 2: ").strip()
+            choice = input("  Enter 1, 2 or 3: ").strip()
             if choice == "1":
                 use_image = False
                 face_hands_only = False
+                full_body_only = False
                 break
             elif choice == "2":
                 use_image = False
                 face_hands_only = True
+                full_body_only = False
+                break
+            elif choice == "3":
+                use_image = False
+                face_hands_only = False
+                full_body_only = True
                 break
             else:
-                print("  [!] Invalid input, please enter 1 or 2")
+                print("  [!] Invalid input, please enter 1, 2 or 3")
 
     # ── 面部+手部实时模式 ──
     if face_hands_only:
@@ -1552,6 +1929,15 @@ def main():
             print("No camera selected. Exiting.")
             return
         live_face_hands_acupoints(camera_id, profile=profile)
+        return
+
+    # ── 全身实时穴位定位模式 ──
+    if full_body_only:
+        camera_id = select_camera()
+        if camera_id is None:
+            print("No camera selected. Exiting.")
+            return
+        live_full_body_acupoints(camera_id, profile=profile)
         return
 
     # ── 图片模式（循环选择） ──

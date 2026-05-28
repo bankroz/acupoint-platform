@@ -94,15 +94,22 @@ class AcupointLocator:
     """
 
     def __init__(self, config: Optional[Dict] = None,
-                 profile: Optional[PopulationProfile] = None):
+                 profile: Optional[PopulationProfile] = None,
+                 hand_flip_correction: bool = True):
         """
         Args:
             config: 配置字典（可选，从config.yaml加载）
             profile: 用户身体画像（可选，用于人群系数适配）
+            hand_flip_correction: 是否启用手部镜像纠正。
+                当摄像头画面经过 cv2.flip(1) 水平翻转后再传给 MediaPipe 时，
+                MediaPipe 的左右手标签会与视觉方向相反。启用此选项会自动纠正。
+                对于静态图片（未翻转），应设为 False。
+                （默认 True，适配实时摄像头场景）
         """
         self.config = config or {}
         self.profile = profile
         self._population_adapter = PopulationAdapter() if profile else None
+        self._hand_flip_correction = hand_flip_correction
 
         # 如果提供了画像，预计算通用适配系数
         if self._population_adapter and self.profile:
@@ -194,55 +201,131 @@ class AcupointLocator:
         """
         检测手掌朝向（掌心 vs 掌背对镜头）
 
-        原理：
-        1. 用法向量法：wrist + index_mcp + pinky_mcp 计算手掌平面法向量
-        2. 在 MediaPipe 坐标系中 Z < 0 表示靠近镜头
-        3. 法向量 Z 分量 < 0 → 手掌朝外(朝镜头)
-
-        辅助校验：指尖 Z 深度 vs 腕关节 Z 深度
+        核心原理（与手指弯曲/伸直无关，握拳和张开均有效）：
+        
+          MCP骨性凸起是唯一与手指位置无关的解剖学差异。
+          手背的食中无小指根部骨节（MCP关节）在任何手指姿态下
+          都比手腕更靠近镜头，掌心时 MCP 与掌面齐平。
+        
+        辅助特征：
+          - MCP连线弯曲度（手背呈凸拱桥形）
+          - 四指在2D图像中的张开度（掌心自然更张开）
 
         Returns:
-            "palm"  /  "back_of_hand"  /  None（不确定/侧面）
+            "palm"  /  "back_of_hand"  /  None（无法判断）
         """
         if hand_lms is None or hand_lms.shape[0] < 21:
             return None
 
-        # ── 方法一：手掌法向量 ──
-        wrist = hand_lms[0, :3]        # 手腕
-        idx_mcp = hand_lms[5, :3]      # 食指掌指关节 (MCP)
-        pinky_mcp = hand_lms[17, :3]   # 小指掌指关节 (MCP)
-
-        v1 = idx_mcp - wrist
-        v2 = pinky_mcp - wrist
-        normal = np.cross(v1, v2)
-
-        # MediaPipe 坐标系：Z 越小越靠近镜头
-        # 法向量 z < -0.02 → 掌面朝外(朝镜头) → palm
-        normal_score = normal[2] if abs(normal[2]) > 1e-8 else 0.0
-
-        # ── 方法二：指尖 vs 腕关节深度 ──
-        # 掌心朝镜头时，指尖 Z < 腕关节 Z（指尖更靠近镜头）
-        tip_indices = [4, 8, 12]       # 拇、食、中指指尖
+        # ── F1: MCP凸出度（金标准）──
+        # 正值 = MCP比手腕更靠近镜头 → 掌背
+        mcp_indices = [5, 9, 13, 17]
+        mcp_zs = [hand_lms[i, 2] for i in mcp_indices]
+        mcp_mean_z = np.mean(mcp_zs)
         wrist_z = hand_lms[0, 2]
-        tip_deltas = []
-        for idx in tip_indices:
-            tip_deltas.append(hand_lms[idx, 2] - wrist_z)
+        mcp_prominence = wrist_z - mcp_mean_z
 
-        nearer_count = sum(1 for d in tip_deltas if d < -0.01)  # 指尖更近
+        # ── F2: MCP连线弯曲度 ──
+        # 比较中+无名MCP 与 index-pinky 直线插值的Z差 → 正值=凸起=掌背
+        x_idx, x_pinky = hand_lms[5, 0], hand_lms[17, 0]
+        z_idx, z_pinky = hand_lms[5, 2], hand_lms[17, 2]
+        dx = x_pinky - x_idx
+        if abs(dx) > 1e-6:
+            t_mid = (hand_lms[9, 0] - x_idx) / dx
+            t_ring = (hand_lms[13, 0] - x_idx) / dx
+            interp_z9 = z_idx + t_mid * (z_pinky - z_idx)
+            interp_z13 = z_idx + t_ring * (z_pinky - z_idx)
+        else:
+            interp_z9 = interp_z13 = (z_idx + z_pinky) * 0.5
+        ridge_curve = ((interp_z9 - hand_lms[9, 2]) + (interp_z13 - hand_lms[13, 2])) * 0.5
 
-        # ── 综合判断 ──
-        if normal_score < -0.02 and nearer_count >= 2:
-            return "palm"
-        elif normal_score > 0.02 and nearer_count <= 1:
+        # ── F3: 四指张开度（2D角度，0=并拢, ~1=大幅张开）──
+        tips_2d = hand_lms[[8, 12, 16, 20], :2]
+        wrist_2d = hand_lms[0, :2]
+        total_angle = 0.0
+        for i in range(3):
+            v1 = tips_2d[i] - wrist_2d
+            v2 = tips_2d[i + 1] - wrist_2d
+            cos_a = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2) + 1e-8)
+            total_angle += np.arccos(np.clip(cos_a, -1.0, 1.0))
+        spread = np.clip(total_angle / 0.75, 0.0, 1.0)
+
+        # ── 决策树（MCP凸出度为主，张开度为辅，弯曲度为校验）──
+        # 三个阈值: 0.015(清晰), 0.005(微弱), -0.010(掌心)
+        PROM_CLEAR = 0.015   # MCP明显比手腕近 → 掌背
+        PROM_WEAK  = 0.005   # MCP微弱偏近 → 需辅助判断
+        PROM_PALM  = -0.010  # MCP比手腕远 → 掌心
+
+        if mcp_prominence > PROM_CLEAR:
+            # MCP明显凸出 → 掌背（金标准）
+            # 仅当手指极度张开且凸出度刚过阈值时可能误判，需额外校验
+            if spread > 0.55 and mcp_prominence <= 0.018:
+                return "palm"
             return "back_of_hand"
 
-        # 单一信号判断（较弱）
-        if normal_score < -0.01:
+        elif mcp_prominence < PROM_PALM:
+            # MCP比手腕远 → 掌心
             return "palm"
-        elif normal_score > 0.01:
+
+        elif mcp_prominence > PROM_WEAK:
+            # MCP微弱偏近 → 大概率掌背，用张开度和弯曲度交叉验证
+            if spread > 0.55:
+                # 手指大幅张开 → 矛盾，相信张开度 → 掌心
+                return "palm"
+            if ridge_curve > 0.003:
+                return "back_of_hand"
+            if spread < 0.30:
+                return "back_of_hand"
             return "back_of_hand"
 
-        return None  # 侧面或不确定
+        elif mcp_prominence < -0.003:
+            # MCP微弱偏远 → 掌心
+            if spread < 0.25 and ridge_curve > 0.003:
+                # 手指并拢 + 凸脊 → 矛盾，更可能是掌背
+                return "back_of_hand"
+            return "palm"
+
+        else:
+            # MCP几乎与手腕齐平 → 靠辅助特征判断，需要强证据
+            if spread < 0.22 and ridge_curve > 0.005:
+                return "back_of_hand"
+            elif spread > 0.65 and ridge_curve < 0.002:
+                return "palm"
+            # 其他情况不作判断，避免在侧面等歧义角度错误显示穴位
+            return None
+
+    def _resolve_hand_data(self, hand_side: str,
+                            pose_result) -> Optional[np.ndarray]:
+        """
+        根据 hand_side 获取正确的手部关键点数据，
+        自动处理摄像头镜像翻转导致的左右手标签颠倒。
+
+        原理：
+        摄像头实时画面通常通过 cv2.flip(frame, 1) 进行水平镜像翻转，
+        再传给 MediaPipe。MediaPipe 在非镜像数据上训练，镜像输入会导致
+        其左右手标签与视觉方向相反。启用 hand_flip_correction 后，
+        自动交换 left↔right 以纠正此偏差。
+
+        对于静态图片（不翻转输入），应设置 hand_flip_correction=False。
+
+        Args:
+            hand_side: 穴位定义中的 hand_side ("left"/"right")
+            pose_result: 包含左右手关键点数据的检测结果
+
+        Returns:
+            手部关键点数组 (21,3) 或 None
+        """
+        if self._hand_flip_correction:
+            # 镜像纠正：交换左右手数据
+            target_side = "left" if hand_side == "right" else "right"
+        else:
+            target_side = hand_side
+
+        if target_side == "left" and pose_result.has_left_hand:
+            return pose_result.left_hand_landmarks
+        elif target_side == "right" and pose_result.has_right_hand:
+            return pose_result.right_hand_landmarks
+        return None
 
     # ──────────── 数据库加载 ────────────
 
@@ -259,6 +342,13 @@ class AcupointLocator:
                     if (rule.get("method") == "hand_landmark"
                             and rule.get("hand_side") == "right"):
                         mirrored = self._mirror_hand_acupoint(ap)
+                        if mirrored is not None:
+                            self._acupoint_defs[mirrored["id"]] = mirrored
+                    # 躯干穴位自动镜像：为 side="right" 的旁开穴位生成左侧版本
+                    if (rule.get("method") in ("spine_bone_ratio", "midline_ratio")
+                            and rule.get("side") == "right"
+                            and rule.get("lateral_offset_cun", 0) > 0):
+                        mirrored = self._mirror_torso_acupoint(ap)
                         if mirrored is not None:
                             self._acupoint_defs[mirrored["id"]] = mirrored
                 print(f"[AcupointLocator] 已加载 {len(data.get('acupoints', []))} 个穴位定义: {path}")
@@ -281,6 +371,22 @@ class AcupointLocator:
                 if mirror["name_cn"] == name_cn:
                     mirror["name_cn"] = name_cn + "(左)"
         mirror["location_rule"]["hand_side"] = "left"
+        return mirror
+
+    @staticmethod
+    def _mirror_torso_acupoint(ap_def: dict) -> Optional[dict]:
+        """为右侧躯干/四肢穴位生成左侧镜像副本"""
+        import copy
+        mirror = copy.deepcopy(ap_def)
+        # ID 加 _L 后缀
+        mirror["id"] = ap_def["id"] + "_L"
+        # 中文名加(左)
+        name_cn = ap_def.get("name_cn", "")
+        if "(右)" in name_cn:
+            mirror["name_cn"] = name_cn.replace("(右)", "(左)")
+        elif "(左)" not in name_cn:
+            mirror["name_cn"] = name_cn + "(左)"
+        mirror["location_rule"]["side"] = "left"
         return mirror
 
     def get_acupoint_count(self) -> int:
@@ -409,8 +515,7 @@ class AcupointLocator:
             if valid_ori is not None:
                 ori_match = self._check_orientation(valid_ori, rule, pose_result)
                 if not ori_match:
-                    ap.grade = "D"
-                    ap.confidence = min(ap.confidence, 0.25)
+                    return None  # 朝向不匹配，完全不显示此穴位
 
             return ap
 
@@ -442,18 +547,15 @@ class AcupointLocator:
         # 手部掌心/掌背朝向
         if required in ("palm", "back_of_hand"):
             hand_side = rule.get("hand_side", "right")
-            hand_lms = None
-            if hand_side == "left" and pose_result.has_left_hand:
-                hand_lms = pose_result.left_hand_landmarks
-            elif hand_side == "right" and pose_result.has_right_hand:
-                hand_lms = pose_result.right_hand_landmarks
+            hand_lms = self._resolve_hand_data(hand_side, pose_result)
 
             if hand_lms is None:
                 return True  # 检测不到手时不拦截
 
             hand_ori = self.detect_hand_orientation(hand_lms)
             if hand_ori is None:
-                return True  # 侧面或不确定时不拦截
+                # 不确定时不显示朝向敏感的穴位（宁可漏标也不错标）
+                return False
             return hand_ori == required
 
         # 其他未知朝向类型，默认通过
@@ -514,8 +616,8 @@ class AcupointLocator:
         """
         躯干穴位2D定位：在图像空间沿肩-髋轴插值
 
-        使用与 _locate_spine_ratio 相同的参数（offset_t, lateral_offset_cun等），
-        但直接在2D图像空间计算位置。
+        改进：当髋部检测不稳定时（上半身入镜），使用肩-颈区域作为
+        替代参考轴，避免所有穴位堆积到肩部。
         """
         w, h = image_shape
         n_lms = len(pose_lms)
@@ -525,45 +627,65 @@ class AcupointLocator:
         side = rule.get("side", "midline")
         use_front = rule.get("use_front", False)
 
-        # 肩、髋关键点的2D位置（归一化）
+        # 肩关键点的2D位置（归一化）
         shoulder_l = pose_lms[11, :2] if 11 < n_lms else None
         shoulder_r = pose_lms[12, :2] if 12 < n_lms else None
         hip_l = pose_lms[23, :2] if 23 < n_lms else None
         hip_r = pose_lms[24, :2] if 24 < n_lms else None
 
-        if any(x is None for x in [shoulder_l, shoulder_r, hip_l, hip_r]):
+        if shoulder_l is None or shoulder_r is None:
             return None
 
-        # 检查可见性
-        vis = [pose_lms[i, 3] for i in [11, 12, 23, 24]] if pose_lms.shape[1] > 3 else [1]*4
-        if sum(vis) < 1.0:
-            return None
+        # 检查髋部可见性
+        hip_vis = 0.0
+        if hip_l is not None and hip_r is not None:
+            vis_hl = pose_lms[23, 3] if pose_lms.shape[1] > 3 else 1.0
+            vis_hr = pose_lms[24, 3] if pose_lms.shape[1] > 3 else 1.0
+            hip_vis = max(vis_hl, vis_hr)
 
-        # 肩中点和髋中点（2D）
-        mid_shoulder = (shoulder_l + shoulder_r) / 2.0
-        mid_hip = (hip_l + hip_r) / 2.0
+        if hip_l is None or hip_r is None or hip_vis < 0.15:
+            # ── 髋部不可靠：用肩宽按比例估算髋部位置 ──
+            # 典型站姿：躯干像素高度/肩宽像素 ≈ 1.0（受镜头透视影响）
+            mid_shoulder = (shoulder_l + shoulder_r) / 2.0
 
-        # 沿躯干轴插值（t=0→肩, t=1→髋）
-        t = min(max(offset_t, 0.0), 1.0)
+            shoulder_w_px = np.linalg.norm((shoulder_r - shoulder_l) * np.array([w, h]))
+            torso_est_px = shoulder_w_px * 1.0  # 躯干估算长度（像素）
+            mid_hip_est = mid_shoulder + np.array([0.0, torso_est_px / h])
 
-        # 基础位置：沿肩-髋线插值
-        base_pos = mid_shoulder + t * (mid_hip - mid_shoulder)
+            axis_top = mid_shoulder
+            axis_bottom = mid_hip_est
 
-        # 前后偏移：前正中线(任脉)比后正中线(督脉)更靠近相机
-        # 在2D图像中表现为轻微的Y偏移（前面略低）
-        if use_front:
-            front_bias = 0.02  # 前正中线略低于脊柱线
-            base_pos[1] += front_bias
+            # 沿估算轴插值，offset_t 保持原来的含义 (0=肩, 1=髋)
+            t = min(max(offset_t, 0.0), 1.0)
+            base_pos = axis_top + t * (axis_bottom - axis_top)
+
+            if use_front:
+                base_pos[1] += 0.01
+
+        else:
+            # ── 正常模式：髋部可见 ──
+            vis = [pose_lms[i, 3] for i in [11, 12, 23, 24]] if pose_lms.shape[1] > 3 else [1]*4
+            if sum(vis) < 1.0:
+                return None
+
+            mid_shoulder = (shoulder_l + shoulder_r) / 2.0
+            mid_hip = (hip_l + hip_r) / 2.0
+
+            t = min(max(offset_t, 0.0), 1.0)
+            base_pos = mid_shoulder + t * (mid_hip - mid_shoulder)
+
+            if use_front:
+                front_bias = 0.02
+                base_pos[1] += front_bias
 
         # 左右旁开偏移
         if lateral_offset_cun != 0 and side in ("left", "right"):
-            # 用肩宽估算每寸对应的像素宽度
             shoulder_w_px = np.linalg.norm((shoulder_r - shoulder_l) * np.array([w, h]))
-            # 躯干约8寸宽 → 每寸 = 肩宽/8
-            px_per_cun = shoulder_w_px / 8.0
+            # 改进：用躯干宽度更精确地估算每寸
+            # 成人肩宽约 16 寸（同身寸），每寸 ≈ 肩宽/16
+            px_per_cun = shoulder_w_px / 16.0
             lateral_px = lateral_offset_cun * px_per_cun
 
-            # 左右方向单位向量（2D）
             lr_dir = shoulder_r - shoulder_l
             lr_len = np.linalg.norm(lr_dir)
             if lr_len > 0.001:
@@ -571,6 +693,7 @@ class AcupointLocator:
             else:
                 lr_unit = np.array([1.0, 0.0])
 
+            # 侧向偏移（新 fallback 用比例估算髋部，不再需要缩小系数）
             if side == "right":
                 base_pos = base_pos + lr_unit * (lateral_px / max(w, h))
             else:
@@ -796,11 +919,7 @@ class AcupointLocator:
         if landmark_idx is None:
             return None
 
-        hand_lms = None
-        if hand_side == "left" and pose_result.has_left_hand:
-            hand_lms = pose_result.left_hand_landmarks
-        elif hand_side == "right" and pose_result.has_right_hand:
-            hand_lms = pose_result.right_hand_landmarks
+        hand_lms = self._resolve_hand_data(hand_side, pose_result)
 
         if hand_lms is None:
             return None
@@ -809,7 +928,11 @@ class AcupointLocator:
         pt = hand_lms[landmark_idx, :2]
 
         # 用对应手腕的world坐标作为参考
-        wrist_idx = 15 if hand_side == "left" else 16
+        # 注意：Pose 手腕 landmark (15=left, 16=right) 沿用手部镜像纠正后的逻辑
+        if self._hand_flip_correction:
+            wrist_idx = 16 if hand_side == "left" else 15
+        else:
+            wrist_idx = 15 if hand_side == "left" else 16
         if pose_result.pose_world_landmarks is not None:
             wrist_world = pose_result.pose_world_landmarks[wrist_idx, :3].copy()
             # 手部穴位粗略放在手腕附近
@@ -960,11 +1083,7 @@ class AcupointLocator:
         if landmark_idx is None:
             return None
 
-        hand_lms = None
-        if hand_side == "left" and pose_result.has_left_hand:
-            hand_lms = pose_result.left_hand_landmarks
-        elif hand_side == "right" and pose_result.has_right_hand:
-            hand_lms = pose_result.right_hand_landmarks
+        hand_lms = self._resolve_hand_data(hand_side, pose_result)
 
         if hand_lms is None or landmark_idx >= hand_lms.shape[0]:
             return None
