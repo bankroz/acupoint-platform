@@ -15,6 +15,7 @@ import json
 
 from .pose_extractor import PoseResult
 from .spine_estimator import SpineEstimator, SpineResult
+from .population_adapter import PopulationAdapter, PopulationProfile, AdaptationCoefficients
 
 
 @dataclass
@@ -92,20 +93,35 @@ class AcupointLocator:
             print(f"{ap.name_cn}: {ap.position_3d}")
     """
 
-    def __init__(self, config: Optional[Dict] = None):
+    def __init__(self, config: Optional[Dict] = None,
+                 profile: Optional[PopulationProfile] = None):
         """
         Args:
             config: 配置字典（可选，从config.yaml加载）
+            profile: 用户身体画像（可选，用于人群系数适配）
         """
         self.config = config or {}
-        self.spine_estimator = SpineEstimator(
-            cervical_lordosis=config.get("spine", {}).get("cervical_lordosis", 0.15)
-            if config else 0.15,
-            thoracic_kyphosis=config.get("spine", {}).get("thoracic_kyphosis", 0.35)
-            if config else 0.35,
-            lumbar_lordosis=config.get("spine", {}).get("lumbar_lordosis", 0.50)
-            if config else 0.50,
-        )
+        self.profile = profile
+        self._population_adapter = PopulationAdapter() if profile else None
+
+        # 如果提供了画像，预计算通用适配系数
+        if self._population_adapter and self.profile:
+            spine_coeffs = config.get("spine", {}) if config else {}
+            adapt = self._population_adapter.get_coefficients("spine", self.profile)
+            self.spine_estimator = SpineEstimator(
+                cervical_lordosis=spine_coeffs.get("cervical_lordosis", 0.15) * adapt.spine_curve_modifier,
+                thoracic_kyphosis=spine_coeffs.get("thoracic_kyphosis", 0.35) * adapt.spine_curve_modifier,
+                lumbar_lordosis=spine_coeffs.get("lumbar_lordosis", 0.50) * adapt.spine_curve_modifier,
+            )
+        else:
+            self.spine_estimator = SpineEstimator(
+                cervical_lordosis=config.get("spine", {}).get("cervical_lordosis", 0.15)
+                if config else 0.15,
+                thoracic_kyphosis=config.get("spine", {}).get("thoracic_kyphosis", 0.35)
+                if config else 0.35,
+                lumbar_lordosis=config.get("spine", {}).get("lumbar_lordosis", 0.50)
+                if config else 0.50,
+            )
 
         # 穴位数据库: id -> 定义
         self._acupoint_defs: Dict[str, dict] = {}
@@ -301,6 +317,16 @@ class AcupointLocator:
         for ap_id, ap_def in self._acupoint_defs.items():
             ap_pos = self._locate_single(ap_def, pose_result, result.spine)
             if ap_pos is not None:
+                # ── 应用人群适配系数 ──
+                if self._population_adapter and self.profile:
+                    coeffs = self._population_adapter.get_coefficients(ap_id, self.profile)
+                    # 深度调整：肥胖者穴位更深（皮下脂肪厚度）
+                    if ap_pos.depth is not None:
+                        ap_pos.depth *= coeffs.skin_thickness
+                    # 体表偏移调整：影响脊柱定位精度
+                    ap_pos.position_3d = ap_pos.position_3d * coeffs.offset_modifier
+                    # 标注适配信息
+                    ap_pos.description += f" [适配: skin×{coeffs.skin_thickness:.1f} off×{coeffs.offset_modifier:.2f}]"
                 result.acupoints.append(ap_pos)
 
         # Step 4: 统计

@@ -8,8 +8,9 @@
 3. 空格键拍照 → 运行穴位定位管线 → 浏览器 3D 视图
 4. 按 Q 或 Ctrl+C 退出
 """
-import sys, os, time, cv2, numpy as np
+import sys, os, time, json, cv2, numpy as np
 from datetime import datetime
+from typing import Optional
 
 
 def _imread_quiet(path):
@@ -67,6 +68,131 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.pose_extractor import PoseExtractor, ModelMode
 from core.spine_estimator import SpineEstimator
 from core.acupoint_locator import AcupointLocator
+from core.population_adapter import PopulationAdapter, PopulationProfile, Gender
+
+# ── 用户画像持久化 ──────────────────────────────────────────
+_PROFILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                             "database", "user_profile.json")
+
+
+def _load_user_profile() -> Optional[PopulationProfile]:
+    """从本地文件加载用户画像"""
+    if not os.path.exists(_PROFILE_PATH):
+        return None
+    try:
+        with open(_PROFILE_PATH, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return PopulationProfile(
+            age=data.get("age", 30),
+            gender=Gender.MALE if data.get("gender", "male") == "male" else Gender.FEMALE,
+            height_cm=data.get("height_cm", 170.0),
+            weight_kg=data.get("weight_kg", 65.0),
+        )
+    except Exception:
+        return None
+
+
+def _save_user_profile(profile: PopulationProfile):
+    """保存用户画像到本地文件"""
+    os.makedirs(os.path.dirname(_PROFILE_PATH), exist_ok=True)
+    data = {
+        "age": profile.age,
+        "gender": profile.gender.value,
+        "height_cm": profile.height_cm,
+        "weight_kg": profile.weight_kg,
+        "bmi": round(profile.bmi, 1),
+        "age_group": profile.age_group.value,
+        "body_type": profile.body_type.value,
+    }
+    with open(_PROFILE_PATH, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def _prompt_user_profile() -> PopulationProfile:
+    """
+    交互式采集用户身体参数（身高/体重/年龄/性别）。
+    如果已有保存的画像则直接加载，允许用户修改。
+    """
+    existing = _load_user_profile()
+    if existing is not None:
+        print("\n" + "=" * 50)
+        print(f"  [已有用户画像]")
+        print(f"    年龄: {existing.age}岁  |  性别: {'男' if existing.gender == Gender.MALE else '女'}")
+        print(f"    身高: {existing.height_cm}cm  |  体重: {existing.weight_kg}kg")
+        print(f"    BMI: {existing.bmi:.1f}  |  体型: {existing.body_type.value}")
+        print(f"    年龄组: {existing.age_group.value}")
+        print("=" * 50)
+        ans = input("  是否使用此画像? [Y=是 / N=重新输入]: ").strip().lower()
+        if ans != 'n':
+            return existing
+
+    print("\n" + "=" * 50)
+    print("    请输入您的身体参数（用于穴位定位精度校准）")
+    print("=" * 50)
+
+    # 性别
+    while True:
+        gender_str = input("  性别 [1=男 / 2=女, 默认1]: ").strip()
+        if gender_str in ('', '1'):
+            gender = Gender.MALE
+            break
+        elif gender_str == '2':
+            gender = Gender.FEMALE
+            break
+        else:
+            print("    请输入 1 或 2")
+
+    # 年龄
+    while True:
+        try:
+            age_str = input("  年龄 [默认30]: ").strip()
+            age = 30 if age_str == '' else int(age_str)
+            if 1 <= age <= 120:
+                break
+            else:
+                print("    请输入 1-120 之间的数字")
+        except ValueError:
+            print("    请输入有效数字")
+
+    # 身高
+    while True:
+        try:
+            h_str = input("  身高(cm) [默认170]: ").strip()
+            height = 170.0 if h_str == '' else float(h_str)
+            if 50 <= height <= 250:
+                break
+            else:
+                print("    请输入 50-250 之间的数字")
+        except ValueError:
+            print("    请输入有效数字")
+
+    # 体重
+    while True:
+        try:
+            w_str = input("  体重(kg) [默认65]: ").strip()
+            weight = 65.0 if w_str == '' else float(w_str)
+            if 20 <= weight <= 300:
+                break
+            else:
+                print("    请输入 20-300 之间的数字")
+        except ValueError:
+            print("    请输入有效数字")
+
+    profile = PopulationProfile(age=age, gender=gender, height_cm=height, weight_kg=weight)
+    _save_user_profile(profile)
+
+    print(f"\n  [OK] 画像已保存:")
+    print(f"    {age}岁 {'男' if gender == Gender.MALE else '女'}性")
+    print(f"    {height}cm / {weight}kg  BMI={profile.bmi:.1f}")
+    print(f"    年龄组: {profile.age_group.value}  体型: {profile.body_type.value}")
+    print(f"    适配系数: ratio×{profile.age_group.value} + body×{profile.body_type.value}")
+    return profile
+
+
+def _format_profile_hud(profile: PopulationProfile) -> str:
+    """格式化用户画像为 HUD 显示字符串"""
+    gender_label = "男" if profile.gender == Gender.MALE else "女"
+    return f"{gender_label} {profile.age}岁 {profile.height_cm}cm {profile.weight_kg}kg BMI={profile.bmi:.1f}"
 
 
 # ── Landmark 解包 ──────────────────────────────────────────
@@ -900,10 +1026,18 @@ def draw_acupoints_on_image(image: np.ndarray, acu, pose_result,
 
 # ── 穴位定位管线 ──────────────────────────────────────────
 
-def run_detection_pipeline(image):
+def run_detection_pipeline(image, profile: Optional[PopulationProfile] = None):
     """运行完整的穴位定位管线，返回成功与否"""
     h, w = image.shape[:2]
     print(f"  Image size: {w}x{h}")
+
+    # ── 人群画像信息 ──
+    if profile is not None:
+        adapter = PopulationAdapter()
+        coeffs = adapter.get_coefficients("full_body", profile)
+        print(f"  [人群画像] {_format_profile_hud(profile)}")
+        print(f"             ratio×{coeffs.ratio_modifier:.2f} offset×{coeffs.offset_modifier:.2f}")
+
 
     # 1. Pose detection
     print("\n[Step 1] MediaPipe Pose detection...")
@@ -952,7 +1086,7 @@ def run_detection_pipeline(image):
 
     # 4. Acupoint localization
     print("\n[Step 3] Acupoint localization...")
-    locator = AcupointLocator()
+    locator = AcupointLocator(profile=profile)
     locator.load_database([
         "database/acupoints_torso.json",
         "database/acupoints_limbs.json",
@@ -997,7 +1131,8 @@ def run_detection_pipeline(image):
 
 # ── 面部+手部实时穴位检测 ──────────────────────────────────
 
-def live_face_hands_acupoints(camera_id: int):
+def live_face_hands_acupoints(camera_id: int,
+                              profile: Optional[PopulationProfile] = None):
     """
     实时面部+手部穴位检测模式。
 
@@ -1079,6 +1214,15 @@ def live_face_hands_acupoints(camera_id: int):
     print("  Controls: [Q] Quit  [S] Screenshot  [G] Grade Filter\n")
     print("  Place your face and hands in front of the camera")
 
+    # ── 计算人群适配系数 ──
+    _adapter = PopulationAdapter()
+    coeffs = _adapter.get_coefficients("default", profile) if profile \
+        else _adapter.get_coefficients("default", PopulationProfile())
+    if profile:
+        print(f"  [人群适配] {_format_profile_hud(profile)}")
+        print(f"             ratio×{coeffs.ratio_modifier:.2f} offset×{coeffs.offset_modifier:.2f} "
+              f"skin×{coeffs.skin_thickness:.2f}")
+
     while True:
         ret, frame_bgr = cap.read()
         if not ret or frame_bgr is None:
@@ -1144,9 +1288,11 @@ def live_face_hands_acupoints(camera_id: int):
                         detected_acupoints.append(ap)
 
             # ── 手部检测 ──
+            # 注意：画面经过 cv2.flip 水平镜像，MediaPipe 的解剖学左右
+            # 与屏幕视觉左右相反，因此 HUD 标签需交换显示
             for hand_side, hand_lms_attr, color, side_label in [
-                ("left", "left_hand_landmarks", COLOR_HAND, "Left"),
-                ("right", "right_hand_landmarks", (255, 150, 50), "Right"),
+                ("left", "left_hand_landmarks", COLOR_HAND, "Right"),
+                ("right", "right_hand_landmarks", (255, 150, 50), "Left"),
             ]:
                 hlms = _unwrap_landmarks(getattr(result, hand_lms_attr, None))
                 if hlms:
@@ -1213,8 +1359,9 @@ def live_face_hands_acupoints(camera_id: int):
         # ── 右侧状态面板 ──
         panel_x = w - 200
         panel_y = 20
+        # 注意：画面已镜像，状态面板左右也需交换
         for i, (label, ok) in enumerate([
-            ("Face    ", face_ok), ("L-Hand  ", left_ok), ("R-Hand  ", right_ok),
+            ("Face    ", face_ok), ("L-Hand  ", right_ok), ("R-Hand  ", left_ok),
         ]):
             y = panel_y + i * 30
             color = COLOR_OK if ok else COLOR_OFF
@@ -1227,6 +1374,19 @@ def live_face_hands_acupoints(camera_id: int):
                       if grade_order.get(pt[5] if len(pt) > 5 else "D", 9) <= grade_order.get(grade_filter, 9))
         cv2.putText(display, f"Acupoints: {visible}", (panel_x, panel_y + 105),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, COLOR_OK if visible > 0 else COLOR_OFF, 1, cv2.LINE_AA)
+
+        # ── 用户画像 HUD（右侧面板下方） ──
+        if profile is not None:
+            profile_texts = [
+                f"{'男' if profile.gender == Gender.MALE else '女'} {profile.age}岁",
+                f"{profile.height_cm:.0f}cm {profile.weight_kg:.0f}kg",
+                f"BMI={profile.bmi:.1f} {profile.body_type.value}",
+                f"ratio×{coeffs.ratio_modifier:.2f} off×{coeffs.offset_modifier:.2f}",
+            ]
+            for j, text in enumerate(profile_texts):
+                y = panel_y + 140 + j * 20
+                cv2.putText(display, text, (panel_x, y),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 200, 200), 1, cv2.LINE_AA)
 
         # ── 顶部 HUD ──
         fps = 1000 / latency if latency > 0 else 0
@@ -1330,6 +1490,14 @@ def main():
     print("=" * 60)
     print(f"\n  {PoseExtractor.get_gpu_status()}\n")
 
+    # ── 采集用户身体参数（用于人群加权适配） ──
+    profile = _prompt_user_profile()
+    adapter = PopulationAdapter()
+    coeffs = adapter.get_coefficients("default", profile)
+    print(f"\n  [人群适配] ratio×{coeffs.ratio_modifier:.2f}  "
+          f"offset×{coeffs.offset_modifier:.2f}  "
+          f"skin×{coeffs.skin_thickness:.2f}")
+
     # ── 选择检测来源和质量 ──
     image_path = "input/images/test.jpg"
     has_existing = os.path.exists(image_path)
@@ -1383,7 +1551,7 @@ def main():
         if camera_id is None:
             print("No camera selected. Exiting.")
             return
-        live_face_hands_acupoints(camera_id)
+        live_face_hands_acupoints(camera_id, profile=profile)
         return
 
     # ── 图片模式（循环选择） ──
@@ -1391,7 +1559,7 @@ def main():
         # 先处理默认图片
         image = _imread_quiet(image_path)
         if image is not None:
-            run_detection_pipeline(image)
+            run_detection_pipeline(image, profile=profile)
 
         print("\n" + "=" * 60)
         print("  [图片模式] 选择图片即可自动解析穴位")
@@ -1429,7 +1597,7 @@ def main():
                     img = _imread_quiet(fp)
                     if img is not None:
                         print(f"\n  Analyzing: {os.path.basename(fp)}")
-                        run_detection_pipeline(img)
+                        run_detection_pipeline(img, profile=profile)
                         # 处理完后重新显示引导界面
                         guide = _make_guide_image()
                         cv2.imshow('perfess mediapipe test', guide)
@@ -1468,7 +1636,7 @@ def main():
         print(f"  [OK] Photo saved: {image_path}")
 
         # 运行分析管线
-        success = run_detection_pipeline(captured_frame)
+        success = run_detection_pipeline(captured_frame, profile=profile)
 
         if success:
             return

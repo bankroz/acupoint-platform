@@ -34,6 +34,11 @@ input/images/*
 Thumbs.db
 desktop.ini
 
+# === 压缩包 ===
+*.rar
+*.zip
+*.7z
+
 # === Jupyter ===
 .ipynb_checkpoints/
 

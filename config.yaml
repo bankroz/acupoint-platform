@@ -57,6 +57,13 @@ bone_cun:
 
 # ---- 人群适配默认系数 ----
 population:
+  # ── 用户身体画像（启动时可交互修改）──
+  user_profile:
+    age: 30                # 年龄 1-120
+    gender: "male"         # male / female
+    height_cm: 170.0       # 身高 50-250 cm
+    weight_kg: 65.0        # 体重 20-300 kg
+  # ── 人群分组默认系数 ──
   default_adult:
     ratio_modifier: 1.0
     offset_modifier: 1.0

@@ -16,6 +16,28 @@ from typing import Optional
 
 from core.pose_extractor import PoseExtractor, ModelMode
 from core.acupoint_locator import AcupointLocator
+from core.population_adapter import PopulationProfile, Gender, PopulationAdapter
+
+# ── 用户画像持久化 ──
+_PROFILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                             "database", "user_profile.json")
+
+def _load_profile():
+    """加载保存的用户画像"""
+    import json
+    if not os.path.exists(_PROFILE_PATH):
+        return None
+    try:
+        with open(_PROFILE_PATH, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return PopulationProfile(
+            age=data.get("age", 30),
+            gender=Gender.MALE if data.get("gender", "male") == "male" else Gender.FEMALE,
+            height_cm=data.get("height_cm", 170.0),
+            weight_kg=data.get("weight_kg", 65.0),
+        )
+    except Exception:
+        return None
 
 # ── 绘制常量 ──
 HAND_CONNECTIONS = [
@@ -76,7 +98,11 @@ def main():
         print("  模式: Pose (仅姿态)")
 
     # ── 穴位定位器 ──
-    locator = AcupointLocator()
+    profile = _load_profile()
+    if profile:
+        print(f"  [人群画像] {'男' if profile.gender == Gender.MALE else '女'} {profile.age}岁 "
+              f"BMI={profile.bmi:.1f} {profile.body_type.value}")
+    locator = AcupointLocator(profile=profile)
     locator.load_database(["database/acupoints_torso.json", "database/acupoints_limbs.json", "database/acupoints_hands.json"])
     print(f"  穴位: {locator.get_acupoint_count()} 个")
 

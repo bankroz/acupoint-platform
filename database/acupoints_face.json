@@ -1,14 +1,24 @@
 {
   "description": "面部穴位数据库 - 基于MediaPipe Holistic Face Mesh (468点)",
   "region": "face",
-  "estimated_count": 18,
-  "notes": "需要Holistic模型支持，Pose-only模式下无法定位",
+  "estimated_count": 28,
+  "notes": "需要Holistic模型支持，Pose-only模式下无法定位。眼部穴位使用Face Mesh 468点中的眼眶/眉弓索引。",
   "face_mesh_indices_reference": {
     "nose_tip": 4,
     "left_eye_inner": 133,
     "right_eye_inner": 362,
     "left_eye_outer": 33,
     "right_eye_outer": 263,
+    "left_eye_upper": 159,
+    "right_eye_upper": 386,
+    "left_eye_lower": 145,
+    "right_eye_lower": 374,
+    "left_eyebrow_center": 52,
+    "right_eyebrow_center": 282,
+    "left_eyebrow_outer": 66,
+    "right_eyebrow_outer": 296,
+    "left_eyebrow_inner": 105,
+    "right_eyebrow_inner": 334,
     "mid_forehead": 10,
     "mid_between_eyes": 168,
     "philtrum": 13,
@@ -240,16 +250,14 @@
       "valid_orientation": "front"
     },
     {
-      "id": "BL2",
-      "name_cn": "攒竹",
+      "id": "BL2_L",
+      "name_cn": "攒竹(左)",
       "name_pinyin": "CuanZhu",
       "meridian": "足太阳膀胱经",
       "meridian_code": "BL",
       "location_rule": {
         "method": "face_mesh",
-        "face_indices": [
-          105
-        ],
+        "face_indices": [105],
         "description": "眉头凹陷中，眶上切迹处(左)"
       },
       "clinical": {
@@ -271,6 +279,215 @@
       "valid_orientation": "front"
     },
     {
+      "id": "BL1_L",
+      "name_cn": "睛明(左)",
+      "name_pinyin": "JingMing",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [133],
+        "description": "目内眦角稍上方凹陷中(左)"
+      },
+      "clinical": {
+        "functions": ["明目退翳", "祛风清热"],
+        "indications": ["目赤肿痛", "迎风流泪", "近视", "夜盲"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.6, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "BL1_R",
+      "name_cn": "睛明(右)",
+      "name_pinyin": "JingMing",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [362],
+        "description": "目内眦角稍上方凹陷中(右)"
+      },
+      "clinical": {
+        "functions": ["明目退翳", "祛风清热"],
+        "indications": ["目赤肿痛", "迎风流泪", "近视", "夜盲"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.6, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "EX_HN4_L",
+      "name_cn": "鱼腰(左)",
+      "name_pinyin": "YuYao",
+      "meridian": "经外奇穴",
+      "meridian_code": "EX",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [52, 55],
+        "description": "瞳孔直上，眉毛中点处(左)"
+      },
+      "clinical": {
+        "functions": ["清头明目", "疏风通络"],
+        "indications": ["目赤肿痛", "眼睑下垂", "眉棱骨痛", "面瘫"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.6, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "EX_HN4_R",
+      "name_cn": "鱼腰(右)",
+      "name_pinyin": "YuYao",
+      "meridian": "经外奇穴",
+      "meridian_code": "EX",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [282, 285],
+        "description": "瞳孔直上，眉毛中点处(右)"
+      },
+      "clinical": {
+        "functions": ["清头明目", "疏风通络"],
+        "indications": ["目赤肿痛", "眼睑下垂", "眉棱骨痛", "面瘫"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.6, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "TE23_L",
+      "name_cn": "丝竹空(左)",
+      "name_pinyin": "SiZhuKong",
+      "meridian": "手少阳三焦经",
+      "meridian_code": "TE",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [66],
+        "description": "眉梢外侧端凹陷中(左)"
+      },
+      "clinical": {
+        "functions": ["疏风清热", "明目止痛"],
+        "indications": ["头痛", "目赤肿痛", "眼睑跳动", "面瘫"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.5, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "TE23_R",
+      "name_cn": "丝竹空(右)",
+      "name_pinyin": "SiZhuKong",
+      "meridian": "手少阳三焦经",
+      "meridian_code": "TE",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [296],
+        "description": "眉梢外侧端凹陷中(右)"
+      },
+      "clinical": {
+        "functions": ["疏风清热", "明目止痛"],
+        "indications": ["头痛", "目赤肿痛", "眼睑跳动", "面瘫"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.5, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "GB1_L",
+      "name_cn": "瞳子髎(左)",
+      "name_pinyin": "TongZiLiao",
+      "meridian": "足少阳胆经",
+      "meridian_code": "GB",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [33],
+        "description": "目外眦外侧0.5寸，眶骨外缘凹陷中(左)"
+      },
+      "clinical": {
+        "functions": ["疏风清热", "明目退翳"],
+        "indications": ["头痛", "目赤肿痛", "迎风流泪", "近视"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.5, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "GB1_R",
+      "name_cn": "瞳子髎(右)",
+      "name_pinyin": "TongZiLiao",
+      "meridian": "足少阳胆经",
+      "meridian_code": "GB",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [263],
+        "description": "目外眦外侧0.5寸，眶骨外缘凹陷中(右)"
+      },
+      "clinical": {
+        "functions": ["疏风清热", "明目退翳"],
+        "indications": ["头痛", "目赤肿痛", "迎风流泪", "近视"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.5, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "ST1_L",
+      "name_cn": "承泣(左)",
+      "name_pinyin": "ChengQi",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [145],
+        "description": "瞳孔直下，眼球与眶下缘之间(左)"
+      },
+      "clinical": {
+        "functions": ["疏风清热", "明目止痛"],
+        "indications": ["目赤肿痛", "迎风流泪", "夜盲", "眼睑跳动"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.6, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "ST1_R",
+      "name_cn": "承泣(右)",
+      "name_pinyin": "ChengQi",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [374],
+        "description": "瞳孔直下，眼球与眶下缘之间(右)"
+      },
+      "clinical": {
+        "functions": ["疏风清热", "明目止痛"],
+        "indications": ["目赤肿痛", "迎风流泪", "夜盲", "眼睑跳动"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.6, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "BL2_R",
+      "name_cn": "攒竹(右)",
+      "name_pinyin": "CuanZhu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [334],
+        "description": "眉头凹陷中，眶上切迹处(右)"
+      },
+      "clinical": {
+        "functions": ["疏风清热", "明目止痛"],
+        "indications": ["头痛", "目赤肿痛", "眼睑跳动"],
+        "needling_depth_cm": 0.3
+      },
+      "validation": { "confidence_min": 0.5, "grade": "B" },
+      "valid_orientation": "front"
+    },
+    {
       "id": "GV24",
       "name_cn": "神庭",
       "name_pinyin": "ShenTing",
@@ -278,27 +495,15 @@
       "meridian_code": "GV",
       "location_rule": {
         "method": "face_mesh",
-        "face_indices": [
-          10
-        ],
+        "face_indices": [10],
         "description": "前发际正中直上0.5寸"
       },
       "clinical": {
-        "functions": [
-          "安神定志",
-          "清头明目"
-        ],
-        "indications": [
-          "头痛",
-          "失眠",
-          "眩晕"
-        ],
+        "functions": ["安神定志", "清头明目"],
+        "indications": ["头痛", "失眠", "眩晕"],
         "needling_depth_cm": 0.5
       },
-      "validation": {
-        "confidence_min": 0.5,
-        "grade": "B"
-      },
+      "validation": { "confidence_min": 0.5, "grade": "B" },
       "valid_orientation": "front"
     }
   ]
