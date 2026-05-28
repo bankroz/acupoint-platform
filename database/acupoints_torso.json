@@ -1,0 +1,1236 @@
+{
+  "description": "躯干部位穴位数据库 - 基于虚拟脊柱定位",
+  "region": "torso",
+  "estimated_count": 72,
+  "methods": {
+    "spine_bone_ratio": "基于虚拟脊柱椎骨参考+比例偏移",
+    "midline_ratio": "基于前后正中线比例定位"
+  },
+  "acupoints": [
+    {
+      "id": "CV22",
+      "name_cn": "天突",
+      "name_pinyin": "TianTu",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 22,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "C7",
+        "offset_t": 0.0,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "胸骨上窝正中，约C7水平"
+      },
+      "clinical": {
+        "functions": [
+          "宣肺止咳",
+          "降逆止呕",
+          "利咽开音"
+        ],
+        "indications": [
+          "咳嗽",
+          "哮喘",
+          "咽喉肿痛",
+          "呃逆"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV17",
+      "name_cn": "膻中",
+      "name_pinyin": "DanZhong",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 17,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T4",
+        "offset_t": 0.17,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "两乳头连线中点，平第4肋间隙(T4水平)"
+      },
+      "clinical": {
+        "functions": [
+          "宽胸理气",
+          "宣肺平喘",
+          "宁心安神"
+        ],
+        "indications": [
+          "胸闷",
+          "心悸",
+          "咳嗽",
+          "哮喘",
+          "产后缺乳"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV15",
+      "name_cn": "鸠尾(前胸)",
+      "name_pinyin": "JiuWei",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 15,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T5",
+        "offset_t": 0.21,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "剑突下，脐上7寸(T5水平)，任脉络穴"
+      },
+      "clinical": {
+        "functions": [
+          "宁心安神",
+          "宽胸降逆"
+        ],
+        "indications": [
+          "心痛",
+          "心悸",
+          "胃痛",
+          "癫痫"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV14",
+      "name_cn": "巨阙",
+      "name_pinyin": "JuQue",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 14,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T6",
+        "offset_t": 0.25,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "脐上6寸，剑突下2寸"
+      },
+      "clinical": {
+        "functions": [
+          "宁心安神",
+          "宽胸降逆"
+        ],
+        "indications": [
+          "心悸",
+          "胸痛",
+          "胃痛",
+          "呕吐"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV12",
+      "name_cn": "中脘",
+      "name_pinyin": "ZhongWan",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 12,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T8",
+        "offset_t": 0.33,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "脐上4寸，胃经募穴，八会穴之腑会"
+      },
+      "clinical": {
+        "functions": [
+          "健脾和胃",
+          "消食导滞",
+          "调理中焦"
+        ],
+        "indications": [
+          "胃痛",
+          "腹胀",
+          "呕吐",
+          "泄泻",
+          "消化不良"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV10",
+      "name_cn": "下脘(前胸)",
+      "name_pinyin": "XiaWan",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 10,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T10",
+        "offset_t": 0.42,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "脐上2寸(T10水平)"
+      },
+      "clinical": {
+        "functions": [
+          "健脾和胃",
+          "消食导滞"
+        ],
+        "indications": [
+          "胃痛",
+          "腹胀",
+          "呕吐",
+          "消化不良"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV8",
+      "name_cn": "神阙",
+      "name_pinyin": "ShenQue",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 8,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "L1",
+        "offset_t": 0.54,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "脐中(L3-L4水平)"
+      },
+      "clinical": {
+        "functions": [
+          "回阳救逆",
+          "温中散寒",
+          "培元固本"
+        ],
+        "indications": [
+          "腹痛",
+          "腹泻",
+          "脱证",
+          "水肿"
+        ],
+        "needling_depth_cm": 0
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV6",
+      "name_cn": "气海",
+      "name_pinyin": "QiHai",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 6,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "L2",
+        "offset_t": 0.58,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "脐下1.5寸(L2水平)"
+      },
+      "clinical": {
+        "functions": [
+          "培元固本",
+          "补气升阳",
+          "调补下焦"
+        ],
+        "indications": [
+          "虚脱",
+          "腹痛",
+          "遗尿",
+          "月经不调",
+          "阳痿"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV4",
+      "name_cn": "关元",
+      "name_pinyin": "GuanYuan",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 4,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "L3",
+        "offset_t": 0.63,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "脐下3寸，小肠募穴"
+      },
+      "clinical": {
+        "functions": [
+          "培元固本",
+          "补肾壮阳",
+          "调理冲任"
+        ],
+        "indications": [
+          "遗尿",
+          "阳痿",
+          "月经不调",
+          "腹痛",
+          "虚劳"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "CV3",
+      "name_cn": "中极",
+      "name_pinyin": "ZhongJi",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "index_in_meridian": 3,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "L4",
+        "offset_t": 0.67,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "脐下4寸，膀胱募穴"
+      },
+      "clinical": {
+        "functions": [
+          "利水通淋",
+          "调理下焦"
+        ],
+        "indications": [
+          "遗尿",
+          "小便不利",
+          "阳痿",
+          "月经不调"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "GV14",
+      "name_cn": "大椎",
+      "name_pinyin": "DaZhui",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "index_in_meridian": 14,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "C7",
+        "offset_t": 0.0,
+        "use_front": false,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "第7颈椎棘突下凹陷中，肩中点正后方"
+      },
+      "clinical": {
+        "functions": [
+          "解表退热",
+          "通督安神",
+          "增强免疫"
+        ],
+        "indications": [
+          "发热",
+          "感冒",
+          "颈椎病",
+          "免疫力低下"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "B"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "GV13",
+      "name_cn": "陶道",
+      "name_pinyin": "TaoDao",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "index_in_meridian": 13,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T1",
+        "offset_t": 0.04,
+        "use_front": false,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "第1胸椎棘突下(T1水平)"
+      },
+      "clinical": {
+        "functions": [
+          "解表退热",
+          "安神定志"
+        ],
+        "indications": [
+          "发热",
+          "头痛",
+          "疟疾",
+          "癫痫"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "GV12",
+      "name_cn": "身柱",
+      "name_pinyin": "ShenZhu",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "index_in_meridian": 12,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T3",
+        "offset_t": 0.12,
+        "use_front": false,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "第3胸椎棘突下(T3水平)"
+      },
+      "clinical": {
+        "functions": [
+          "宣肺止咳",
+          "安神定惊"
+        ],
+        "indications": [
+          "咳嗽",
+          "哮喘",
+          "脊背强痛",
+          "小儿惊风"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "GV11",
+      "name_cn": "神道(背面)",
+      "name_pinyin": "ShenDao",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "index_in_meridian": 11,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T5",
+        "offset_t": 0.21,
+        "use_front": false,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "第5胸椎棘突下(T5水平)，背面"
+      },
+      "clinical": {
+        "functions": [
+          "宁心安神",
+          "清热定惊"
+        ],
+        "indications": [
+          "心悸",
+          "失眠",
+          "神经衰弱",
+          "脊背强痛"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "GV9",
+      "name_cn": "至阳(背面)",
+      "name_pinyin": "ZhiYang",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "index_in_meridian": 9,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T7",
+        "offset_t": 0.29,
+        "use_front": false,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "第7胸椎棘突下(T7水平)，肩胛骨下角连线中点"
+      },
+      "clinical": {
+        "functions": [
+          "宽胸理气",
+          "解痉止痛"
+        ],
+        "indications": [
+          "胸胁胀痛",
+          "黄疸",
+          "背痛",
+          "咳嗽"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "GV6",
+      "name_cn": "脊中(背面)",
+      "name_pinyin": "JiZhong",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "index_in_meridian": 6,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T11",
+        "offset_t": 0.46,
+        "use_front": false,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "第11胸椎棘突下(T11水平)，背面"
+      },
+      "clinical": {
+        "functions": [
+          "健脾利湿",
+          "镇痉止痛"
+        ],
+        "indications": [
+          "腹泻",
+          "黄疸",
+          "腰脊强痛"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "GV4",
+      "name_cn": "命门(背面)",
+      "name_pinyin": "MingMen",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "index_in_meridian": 4,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "L2",
+        "offset_t": 0.58,
+        "use_front": false,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "第2腰椎棘突下(L2水平)，与脐相对"
+      },
+      "clinical": {
+        "functions": [
+          "补肾壮阳",
+          "固精培元",
+          "强腰健膝"
+        ],
+        "indications": [
+          "腰痛",
+          "阳痿",
+          "遗精",
+          "月经不调",
+          "腹泻"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "GV3",
+      "name_cn": "腰阳关",
+      "name_pinyin": "YaoYangGuan",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "index_in_meridian": 3,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "L4",
+        "offset_t": 0.67,
+        "use_front": false,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "第4腰椎棘突下(L4水平)，髋中点正后方"
+      },
+      "clinical": {
+        "functions": [
+          "强腰膝",
+          "祛寒湿",
+          "调经止带"
+        ],
+        "indications": [
+          "腰痛",
+          "下肢痿痹",
+          "月经不调",
+          "遗精"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "B"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL13",
+      "name_cn": "肺俞",
+      "name_pinyin": "FeiShu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "index_in_meridian": 13,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T3",
+        "offset_t": 0.12,
+        "use_front": false,
+        "lateral_offset_cun": 1.5,
+        "side": "right",
+        "description": "第3胸椎棘突下旁开1.5寸，肺之背俞穴"
+      },
+      "clinical": {
+        "functions": [
+          "宣肺解表",
+          "止咳化痰"
+        ],
+        "indications": [
+          "咳嗽",
+          "哮喘",
+          "感冒",
+          "肺结核"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL15",
+      "name_cn": "心俞",
+      "name_pinyin": "XinShu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "index_in_meridian": 15,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T5",
+        "offset_t": 0.21,
+        "use_front": false,
+        "lateral_offset_cun": 1.5,
+        "side": "right",
+        "description": "第5胸椎棘突下旁开1.5寸，心之背俞穴"
+      },
+      "clinical": {
+        "functions": [
+          "养心安神",
+          "宽胸理气"
+        ],
+        "indications": [
+          "心悸",
+          "失眠",
+          "心痛",
+          "胸闷"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL17",
+      "name_cn": "膈俞",
+      "name_pinyin": "GeShu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "index_in_meridian": 17,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T7",
+        "offset_t": 0.29,
+        "use_front": false,
+        "lateral_offset_cun": 1.5,
+        "side": "right",
+        "description": "第7胸椎棘突下旁开1.5寸，八会穴之血会"
+      },
+      "clinical": {
+        "functions": [
+          "活血化瘀",
+          "宽胸利膈"
+        ],
+        "indications": [
+          "胸胁痛",
+          "吐血",
+          "贫血",
+          "潮热"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL18",
+      "name_cn": "肝俞",
+      "name_pinyin": "GanShu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "index_in_meridian": 18,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T9",
+        "offset_t": 0.38,
+        "use_front": false,
+        "lateral_offset_cun": 1.5,
+        "side": "right",
+        "description": "第9胸椎棘突下旁开1.5寸，肝之背俞穴"
+      },
+      "clinical": {
+        "functions": [
+          "疏肝利胆",
+          "明目退翳"
+        ],
+        "indications": [
+          "胁痛",
+          "黄疸",
+          "目赤",
+          "头痛"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL20",
+      "name_cn": "脾俞",
+      "name_pinyin": "PiShu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "index_in_meridian": 20,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T11",
+        "offset_t": 0.46,
+        "use_front": false,
+        "lateral_offset_cun": 1.5,
+        "side": "right",
+        "description": "第11胸椎棘突下旁开1.5寸，脾之背俞穴"
+      },
+      "clinical": {
+        "functions": [
+          "健脾和胃",
+          "利湿升清"
+        ],
+        "indications": [
+          "腹胀",
+          "泄泻",
+          "呕吐",
+          "水肿"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL21",
+      "name_cn": "胃俞",
+      "name_pinyin": "WeiShu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "index_in_meridian": 21,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T12",
+        "offset_t": 0.5,
+        "use_front": false,
+        "lateral_offset_cun": 1.5,
+        "side": "right",
+        "description": "第12胸椎棘突下旁开1.5寸，胃之背俞穴"
+      },
+      "clinical": {
+        "functions": [
+          "和胃降逆",
+          "消食导滞"
+        ],
+        "indications": [
+          "胃痛",
+          "呕吐",
+          "腹胀",
+          "消化不良"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL23",
+      "name_cn": "肾俞",
+      "name_pinyin": "ShenShu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "index_in_meridian": 23,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "L2",
+        "offset_t": 0.58,
+        "use_front": false,
+        "lateral_offset_cun": 1.5,
+        "side": "right",
+        "description": "第2腰椎棘突下旁开1.5寸，肾之背俞穴"
+      },
+      "clinical": {
+        "functions": [
+          "补肾壮阳",
+          "强腰健膝",
+          "纳气平喘"
+        ],
+        "indications": [
+          "腰痛",
+          "阳痿",
+          "遗精",
+          "耳鸣",
+          "水肿"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL25",
+      "name_cn": "大肠俞",
+      "name_pinyin": "DaChangShu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "index_in_meridian": 25,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "L4",
+        "offset_t": 0.67,
+        "use_front": false,
+        "lateral_offset_cun": 1.5,
+        "side": "right",
+        "description": "第4腰椎棘突下旁开1.5寸，大肠之背俞穴"
+      },
+      "clinical": {
+        "functions": [
+          "通腑泄热",
+          "理气止痛"
+        ],
+        "indications": [
+          "便秘",
+          "腹泻",
+          "腰痛",
+          "下肢痿痹"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "ST19",
+      "name_cn": "不容",
+      "name_pinyin": "BuRong",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "offset_t": 0.17,
+        "use_front": true,
+        "lateral_offset_cun": 2.0,
+        "side": "right",
+        "description": "脐上6寸旁开2寸（胸腹部胃经穴位）"
+      },
+      "clinical": {
+        "functions": [
+          "和胃降逆",
+          "消胀止痛"
+        ],
+        "indications": [
+          "胃痛",
+          "呕吐",
+          "腹胀",
+          "食欲不振"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "ST21",
+      "name_cn": "梁门",
+      "name_pinyin": "LiangMen",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "offset_t": 0.29,
+        "use_front": true,
+        "lateral_offset_cun": 2.0,
+        "side": "right",
+        "description": "脐上4寸旁开2寸（T7水平）"
+      },
+      "clinical": {
+        "functions": [
+          "和胃消食",
+          "理气止痛"
+        ],
+        "indications": [
+          "胃痛",
+          "呕吐",
+          "食欲不振",
+          "腹胀"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "ST25",
+      "name_cn": "天枢",
+      "name_pinyin": "TianShu",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "index_in_meridian": 25,
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "offset_t": 0.54,
+        "use_front": true,
+        "lateral_offset_cun": 2.0,
+        "side": "right",
+        "description": "脐旁2寸，大肠募穴"
+      },
+      "clinical": {
+        "functions": [
+          "调理肠胃",
+          "行气止痛",
+          "双向调节"
+        ],
+        "indications": [
+          "腹痛",
+          "腹泻",
+          "便秘",
+          "月经不调"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "ST29",
+      "name_cn": "归来",
+      "name_pinyin": "GuiLai",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "offset_t": 0.67,
+        "use_front": true,
+        "lateral_offset_cun": 2.0,
+        "side": "right",
+        "description": "脐下4寸旁开2寸"
+      },
+      "clinical": {
+        "functions": [
+          "调理下焦",
+          "温经止痛"
+        ],
+        "indications": [
+          "月经不调",
+          "带下",
+          "腹痛",
+          "疝气"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "KI16",
+      "name_cn": "肓俞",
+      "name_pinyin": "HuangShu",
+      "meridian": "足少阴肾经",
+      "meridian_code": "KI",
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "offset_t": 0.54,
+        "use_front": true,
+        "lateral_offset_cun": 0.5,
+        "side": "right",
+        "description": "脐旁0.5寸"
+      },
+      "clinical": {
+        "functions": [
+          "温肾散寒",
+          "理气止痛"
+        ],
+        "indications": [
+          "腹痛",
+          "泄泻",
+          "便秘"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.3,
+        "grade": "D"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "SP15",
+      "name_cn": "大横",
+      "name_pinyin": "DaHeng",
+      "meridian": "足太阴脾经",
+      "meridian_code": "SP",
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "offset_t": 0.54,
+        "use_front": true,
+        "lateral_offset_cun": 4.0,
+        "side": "right",
+        "description": "脐旁4寸"
+      },
+      "clinical": {
+        "functions": [
+          "健脾利湿",
+          "理气止痛"
+        ],
+        "indications": [
+          "腹痛",
+          "泄泻",
+          "便秘"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.3,
+        "grade": "D"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "LV14",
+      "name_cn": "期门",
+      "name_pinyin": "QiMen",
+      "meridian": "足厥阴肝经",
+      "meridian_code": "LR",
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "offset_t": 0.21,
+        "use_front": true,
+        "lateral_offset_cun": 4.0,
+        "side": "right",
+        "description": "乳头直下第6肋间隙(T5-T6水平)，肝之募穴"
+      },
+      "clinical": {
+        "functions": [
+          "疏肝理气",
+          "活血化瘀"
+        ],
+        "indications": [
+          "胁痛",
+          "黄疸",
+          "月经不调"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.3,
+        "grade": "D"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "GB21",
+      "name_cn": "肩井",
+      "name_pinyin": "JianJing",
+      "meridian": "足少阳胆经",
+      "meridian_code": "GB",
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "C7",
+        "offset_t": 0.0,
+        "use_front": false,
+        "lateral_offset_cun": 3.0,
+        "side": "right",
+        "description": "大椎与肩峰连线的中点"
+      },
+      "clinical": {
+        "functions": [
+          "祛风清热",
+          "消肿止痛"
+        ],
+        "indications": [
+          "肩背痛",
+          "落枕",
+          "头痛",
+          "乳腺炎"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "CV17_BL",
+      "name_cn": "膻中(左侧)",
+      "name_pinyin": "DanZhong_L",
+      "meridian": "任脉",
+      "meridian_code": "CV",
+      "location_rule": {
+        "method": "spine_bone_ratio",
+        "vertebra_ref": "T4",
+        "offset_t": 0.17,
+        "use_front": true,
+        "lateral_offset_cun": 0,
+        "side": "midline",
+        "description": "(同CV17)"
+      },
+      "clinical": {
+        "functions": [],
+        "indications": [],
+        "needling_depth_cm": 0
+      },
+      "validation": {
+        "confidence_min": 0.0,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    }
+  ],
+  "meridian_index": {
+    "CV": "任脉",
+    "GV": "督脉",
+    "BL": "足太阳膀胱经",
+    "ST": "足阳明胃经",
+    "KI": "足少阴肾经",
+    "SP": "足太阴脾经",
+    "LR": "足厥阴肝经",
+    "GB": "足少阳胆经"
+  }
+}

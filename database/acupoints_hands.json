@@ -1,0 +1,396 @@
+{
+  "description": "手部穴位数据库 - 基于MediaPipe Holistic Hand Landmarks (每手21点)",
+  "region": "hands",
+  "estimated_count": 20,
+  "notes": "需要Holistic模型支持，Pose-only模式下无法定位",
+  "hand_landmarks_reference": {
+    "wrist": 0,
+    "thumb_cmc": 1,
+    "thumb_mcp": 2,
+    "thumb_ip": 3,
+    "thumb_tip": 4,
+    "index_mcp": 5,
+    "index_pip": 6,
+    "index_dip": 7,
+    "index_tip": 8,
+    "middle_mcp": 9,
+    "middle_pip": 10,
+    "middle_dip": 11,
+    "middle_tip": 12,
+    "ring_mcp": 13,
+    "ring_pip": 14,
+    "ring_dip": 15,
+    "ring_tip": 16,
+    "pinky_mcp": 17,
+    "pinky_pip": 18,
+    "pinky_dip": 19,
+    "pinky_tip": 20
+  },
+  "acupoints": [
+    {
+      "id": "LI4_HAND",
+      "name_cn": "合谷(手部精确定位)",
+      "name_pinyin": "HeGu",
+      "meridian": "手阳明大肠经",
+      "meridian_code": "LI",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 2,
+        "description": "第1、2掌骨间，拇指掌指关节处"
+      },
+      "clinical": {
+        "functions": [
+          "疏风解表",
+          "通络止痛"
+        ],
+        "indications": [
+          "头痛",
+          "牙痛",
+          "发热"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back_of_hand"
+    },
+    {
+      "id": "LI3",
+      "name_cn": "三间(手背)",
+      "name_pinyin": "SanJian",
+      "meridian": "手阳明大肠经",
+      "meridian_code": "LI",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 5,
+        "description": "食指掌指关节后方桡侧凹陷，手背面"
+      },
+      "clinical": {
+        "functions": [
+          "清热止痛",
+          "利咽明目"
+        ],
+        "indications": [
+          "牙痛",
+          "咽喉肿痛",
+          "手指肿痛"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back_of_hand"
+    },
+    {
+      "id": "SI4",
+      "name_cn": "腕骨(手背)",
+      "name_pinyin": "WanGu",
+      "meridian": "手太阳小肠经",
+      "meridian_code": "SI",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 17,
+        "description": "手掌尺侧，第5掌骨基底与钩骨之间凹陷，手背面"
+      },
+      "clinical": {
+        "functions": [
+          "舒筋活络",
+          "清利湿热"
+        ],
+        "indications": [
+          "颈项强痛",
+          "手腕痛",
+          "黄疸"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back_of_hand"
+    },
+    {
+      "id": "TE2",
+      "name_cn": "液门(手背)",
+      "name_pinyin": "YeMen",
+      "meridian": "手少阳三焦经",
+      "meridian_code": "TE",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 13,
+        "description": "手背第4、5指间，指蹼缘后方，手背面"
+      },
+      "clinical": {
+        "functions": [
+          "清热消肿",
+          "通络止痛"
+        ],
+        "indications": [
+          "头痛",
+          "目赤",
+          "手指肿痛",
+          "手臂痛"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back_of_hand"
+    },
+    {
+      "id": "LU11",
+      "name_cn": "少商",
+      "name_pinyin": "ShaoShang",
+      "meridian": "手太阴肺经",
+      "meridian_code": "LU",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 4,
+        "description": "拇指末节桡侧，距指甲角0.1寸"
+      },
+      "clinical": {
+        "functions": [
+          "清热利咽",
+          "开窍醒神"
+        ],
+        "indications": [
+          "咽喉肿痛",
+          "发热",
+          "昏迷"
+        ],
+        "needling_depth_cm": 0.1
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "PC8",
+      "name_cn": "劳宫(掌心)",
+      "name_pinyin": "LaoGong",
+      "meridian": "手厥阴心包经",
+      "meridian_code": "PC",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 9,
+        "description": "掌心，第2、3掌骨之间偏第3掌骨，掌心面"
+      },
+      "clinical": {
+        "functions": [
+          "清心泻火",
+          "安神定志"
+        ],
+        "indications": [
+          "口疮",
+          "心烦",
+          "失眠",
+          "手掌多汗"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "palm"
+    },
+    {
+      "id": "HT8",
+      "name_cn": "少府(掌心)",
+      "name_pinyin": "ShaoFu",
+      "meridian": "手少阴心经",
+      "meridian_code": "HT",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 13,
+        "description": "掌心，第4、5掌骨之间，掌心面"
+      },
+      "clinical": {
+        "functions": [
+          "清心泻火",
+          "安神定志"
+        ],
+        "indications": [
+          "心悸",
+          "失眠",
+          "小便不利"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "palm"
+    },
+    {
+      "id": "PC7",
+      "name_cn": "大陵(掌心面)",
+      "name_pinyin": "DaLing",
+      "meridian": "手厥阴心包经",
+      "meridian_code": "PC",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 0,
+        "description": "腕掌横纹中点，掌长肌腱与桡侧腕屈肌腱之间，掌心面"
+      },
+      "clinical": {
+        "functions": [
+          "宁心安神",
+          "宽胸和胃"
+        ],
+        "indications": [
+          "心痛",
+          "心悸",
+          "胃痛",
+          "手腕痛"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "palm"
+    },
+    {
+      "id": "HT7",
+      "name_cn": "神门(掌心面)",
+      "name_pinyin": "ShenMen",
+      "meridian": "手少阴心经",
+      "meridian_code": "HT",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 17,
+        "description": "腕掌侧横纹尺侧端，尺侧腕屈肌腱桡侧凹陷，掌心面"
+      },
+      "clinical": {
+        "functions": [
+          "宁心安神",
+          "通络止痛"
+        ],
+        "indications": [
+          "失眠",
+          "心悸",
+          "健忘",
+          "腕臂痛"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "palm"
+    },
+    {
+      "id": "LU9",
+      "name_cn": "太渊(掌心面)",
+      "name_pinyin": "TaiYuan",
+      "meridian": "手太阴肺经",
+      "meridian_code": "LU",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 1,
+        "description": "腕掌侧横纹桡侧，桡动脉搏动处，掌心面"
+      },
+      "clinical": {
+        "functions": [
+          "宣肺止咳",
+          "通脉理血"
+        ],
+        "indications": [
+          "咳嗽",
+          "气喘",
+          "手腕痛",
+          "无脉症"
+        ],
+        "needling_depth_cm": 0.3
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "palm"
+    },
+    {
+      "id": "SI3",
+      "name_cn": "后溪(手背)",
+      "name_pinyin": "HouXi",
+      "meridian": "手太阳小肠经",
+      "meridian_code": "SI",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 5,
+        "description": "第5掌指关节后方尺侧，掌横纹尽头，手背面"
+      },
+      "clinical": {
+        "functions": [
+          "通督脉",
+          "舒筋活络"
+        ],
+        "indications": [
+          "颈项强痛",
+          "腰痛",
+          "手指挛急"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back_of_hand"
+    },
+    {
+      "id": "TE3",
+      "name_cn": "中渚(手背)",
+      "name_pinyin": "ZhongZhu",
+      "meridian": "手少阳三焦经",
+      "meridian_code": "TE",
+      "location_rule": {
+        "method": "hand_landmark",
+        "hand_side": "right",
+        "hand_landmark_index": 9,
+        "description": "手背第4、5掌骨小头后方凹陷中，手背面"
+      },
+      "clinical": {
+        "functions": [
+          "清热通络",
+          "聪耳明目"
+        ],
+        "indications": [
+          "耳鸣",
+          "头痛",
+          "手指屈伸不利"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "back_of_hand"
+    }
+  ]
+}

@@ -1,0 +1,701 @@
+{
+  "description": "四肢部位穴位数据库 - 基于MediaPipe Pose骨骼关键点+骨度比例法",
+  "region": "limbs",
+  "estimated_count": 45,
+  "acupoints": [
+    {
+      "id": "LI11",
+      "name_cn": "曲池",
+      "name_pinyin": "QuChi",
+      "meridian": "手阳明大肠经",
+      "meridian_code": "LI",
+      "index_in_meridian": 11,
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 14,
+        "landmark_distal": 16,
+        "ratio": 0.0,
+        "offset_direction": "lateral",
+        "offset_cun": 0,
+        "cun_per_segment": 12,
+        "description": "肘横纹外侧端，屈肘时肘横纹尽头"
+      },
+      "clinical": {
+        "functions": [
+          "清热解表",
+          "调和气血",
+          "祛风止痒"
+        ],
+        "indications": [
+          "发热",
+          "高血压",
+          "手臂疼痛",
+          "风疹"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.7,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "LI10",
+      "name_cn": "手三里",
+      "name_pinyin": "ShouSanLi",
+      "meridian": "手阳明大肠经",
+      "meridian_code": "LI",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 14,
+        "landmark_distal": 16,
+        "ratio": 0.17,
+        "offset_direction": "anterior",
+        "offset_cun": 0,
+        "cun_per_segment": 12,
+        "description": "阳溪与曲池连线上，肘横纹下2寸"
+      },
+      "clinical": {
+        "functions": [
+          "疏通经络",
+          "消肿止痛"
+        ],
+        "indications": [
+          "手臂疼痛",
+          "腹痛",
+          "腹泻"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "LI4",
+      "name_cn": "合谷",
+      "name_pinyin": "HeGu",
+      "meridian": "手阳明大肠经",
+      "meridian_code": "LI",
+      "index_in_meridian": 4,
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 16,
+        "landmark_distal": 20,
+        "ratio": 0.3,
+        "offset_direction": "anterior",
+        "offset_cun": 0,
+        "cun_per_segment": 5,
+        "description": "第1、2掌骨之间，约第2掌骨中点桡侧"
+      },
+      "clinical": {
+        "functions": [
+          "疏风解表",
+          "通络止痛",
+          "面口合谷收"
+        ],
+        "indications": [
+          "头痛",
+          "牙痛",
+          "面瘫",
+          "感冒",
+          "腹痛"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "LU5",
+      "name_cn": "尺泽",
+      "name_pinyin": "ChiZe",
+      "meridian": "手太阴肺经",
+      "meridian_code": "LU",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 13,
+        "landmark_distal": 15,
+        "ratio": 0.0,
+        "offset_direction": "medial",
+        "offset_cun": 0,
+        "cun_per_segment": 12,
+        "description": "肘横纹中，肱二头肌腱桡侧"
+      },
+      "clinical": {
+        "functions": [
+          "清肺泄热",
+          "止咳平喘"
+        ],
+        "indications": [
+          "咳嗽",
+          "哮喘",
+          "咽喉肿痛",
+          "肘臂疼痛"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.7,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "LU7",
+      "name_cn": "列缺",
+      "name_pinyin": "LieQue",
+      "meridian": "手太阴肺经",
+      "meridian_code": "LU",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 13,
+        "landmark_distal": 15,
+        "ratio": 0.13,
+        "offset_direction": "anterior",
+        "offset_cun": 0.5,
+        "cun_per_segment": 12,
+        "description": "桡骨茎突上方，腕横纹上1.5寸"
+      },
+      "clinical": {
+        "functions": [
+          "宣肺解表",
+          "利咽止咳",
+          "头项寻列缺"
+        ],
+        "indications": [
+          "咳嗽",
+          "头痛",
+          "颈项强痛",
+          "面瘫"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "LU9",
+      "name_cn": "太渊",
+      "name_pinyin": "TaiYuan",
+      "meridian": "手太阴肺经",
+      "meridian_code": "LU",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 13,
+        "landmark_distal": 15,
+        "ratio": 0.92,
+        "offset_direction": "medial",
+        "offset_cun": 0,
+        "cun_per_segment": 12,
+        "description": "腕掌侧横纹桡侧，桡动脉搏动处"
+      },
+      "clinical": {
+        "functions": [
+          "宣肺止咳",
+          "通脉理血"
+        ],
+        "indications": [
+          "咳嗽",
+          "气喘",
+          "腕臂痛",
+          "无脉症"
+        ],
+        "needling_depth_cm": 0.3
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "PC6",
+      "name_cn": "内关",
+      "name_pinyin": "NeiGuan",
+      "meridian": "手厥阴心包经",
+      "meridian_code": "PC",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 14,
+        "landmark_distal": 16,
+        "ratio": 0.17,
+        "offset_direction": "anterior_medial",
+        "offset_cun": 0,
+        "cun_per_segment": 12,
+        "description": "腕横纹上2寸，掌长肌腱与桡侧腕屈肌腱之间"
+      },
+      "clinical": {
+        "functions": [
+          "宁心安神",
+          "和胃降逆",
+          "宽胸理气"
+        ],
+        "indications": [
+          "心悸",
+          "失眠",
+          "胃痛",
+          "呕吐",
+          "胸闷"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "HT7",
+      "name_cn": "神门",
+      "name_pinyin": "ShenMen",
+      "meridian": "手少阴心经",
+      "meridian_code": "HT",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 14,
+        "landmark_distal": 16,
+        "ratio": 0.0,
+        "offset_direction": "medial",
+        "offset_cun": 0,
+        "cun_per_segment": 12,
+        "description": "腕掌侧横纹尺侧端，尺侧腕屈肌腱桡侧"
+      },
+      "clinical": {
+        "functions": [
+          "宁心安神",
+          "通络止痛"
+        ],
+        "indications": [
+          "失眠",
+          "心悸",
+          "心烦",
+          "健忘"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "TE5",
+      "name_cn": "外关",
+      "name_pinyin": "WaiGuan",
+      "meridian": "手少阳三焦经",
+      "meridian_code": "TE",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 14,
+        "landmark_distal": 16,
+        "ratio": 0.17,
+        "offset_direction": "posterior",
+        "offset_cun": 0,
+        "cun_per_segment": 12,
+        "description": "腕背横纹上2寸，尺骨与桡骨之间"
+      },
+      "clinical": {
+        "functions": [
+          "解表清热",
+          "通络止痛"
+        ],
+        "indications": [
+          "发热",
+          "头痛",
+          "耳鸣",
+          "胁痛"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "GB34",
+      "name_cn": "阳陵泉",
+      "name_pinyin": "YangLingQuan",
+      "meridian": "足少阳胆经",
+      "meridian_code": "GB",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 26,
+        "landmark_distal": 28,
+        "ratio": 0.0,
+        "offset_direction": "lateral",
+        "offset_cun": 0,
+        "cun_per_segment": 16,
+        "description": "腓骨小头前下方凹陷中，八会穴之筋会"
+      },
+      "clinical": {
+        "functions": [
+          "疏肝利胆",
+          "舒筋活络"
+        ],
+        "indications": [
+          "胁痛",
+          "黄疸",
+          "下肢痿痹",
+          "膝痛"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.7,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "ST36",
+      "name_cn": "足三里",
+      "name_pinyin": "ZuSanLi",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "index_in_meridian": 36,
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 26,
+        "landmark_distal": 28,
+        "ratio": 0.1875,
+        "offset_direction": "anterior_lateral",
+        "offset_cun": 1.0,
+        "cun_per_segment": 16,
+        "description": "犊鼻下3寸，胫骨前嵴外一横指"
+      },
+      "clinical": {
+        "functions": [
+          "健脾胃",
+          "强壮要穴",
+          "调理气血",
+          "增强免疫"
+        ],
+        "indications": [
+          "胃痛",
+          "腹泻",
+          "下肢痿痹",
+          "保健强壮",
+          "虚劳"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.8,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "ST40",
+      "name_cn": "丰隆",
+      "name_pinyin": "FengLong",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 26,
+        "landmark_distal": 28,
+        "ratio": 0.5,
+        "offset_direction": "lateral",
+        "offset_cun": 2.0,
+        "cun_per_segment": 16,
+        "description": "外踝尖上8寸，条口外一横指，胃经络穴"
+      },
+      "clinical": {
+        "functions": [
+          "化痰止咳",
+          "和胃降逆"
+        ],
+        "indications": [
+          "咳嗽痰多",
+          "头痛",
+          "眩晕",
+          "下肢痿痹"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "SP6",
+      "name_cn": "三阴交",
+      "name_pinyin": "SanYinJiao",
+      "meridian": "足太阴脾经",
+      "meridian_code": "SP",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 26,
+        "landmark_distal": 28,
+        "ratio": 0.1875,
+        "offset_direction": "posterior_medial",
+        "offset_cun": 0,
+        "cun_per_segment": 16,
+        "description": "内踝尖上3寸，胫骨内侧缘后方"
+      },
+      "clinical": {
+        "functions": [
+          "健脾利湿",
+          "调补肝肾",
+          "调理冲任"
+        ],
+        "indications": [
+          "月经不调",
+          "失眠",
+          "腹胀",
+          "下肢痿痹",
+          "遗精"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.7,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "SP9",
+      "name_cn": "阴陵泉",
+      "name_pinyin": "YinLingQuan",
+      "meridian": "足太阴脾经",
+      "meridian_code": "SP",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 25,
+        "landmark_distal": 27,
+        "ratio": 0.0,
+        "offset_direction": "medial",
+        "offset_cun": 0,
+        "cun_per_segment": 16,
+        "description": "胫骨内侧髁后下方凹陷中"
+      },
+      "clinical": {
+        "functions": [
+          "健脾利湿",
+          "通利三焦"
+        ],
+        "indications": [
+          "水肿",
+          "腹胀",
+          "腹泻",
+          "膝痛"
+        ],
+        "needling_depth_cm": 1.5
+      },
+      "validation": {
+        "confidence_min": 0.7,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "KI3",
+      "name_cn": "太溪",
+      "name_pinyin": "TaiXi",
+      "meridian": "足少阴肾经",
+      "meridian_code": "KI",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 26,
+        "landmark_distal": 28,
+        "ratio": 1.0,
+        "offset_direction": "posterior",
+        "offset_cun": 0,
+        "cun_per_segment": 16,
+        "description": "内踝尖与跟腱之间的凹陷中，肾经原穴"
+      },
+      "clinical": {
+        "functions": [
+          "滋阴补肾",
+          "调理冲任"
+        ],
+        "indications": [
+          "耳鸣",
+          "失眠",
+          "腰痛",
+          "遗精",
+          "月经不调"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.7,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    },
+    {
+      "id": "BL40",
+      "name_cn": "委中",
+      "name_pinyin": "WeiZhong",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 24,
+        "landmark_distal": 26,
+        "ratio": 1.0,
+        "offset_direction": "posterior",
+        "offset_cun": 0,
+        "cun_per_segment": 19,
+        "description": "腘横纹中点，股二头肌腱与半腱肌腱之间"
+      },
+      "clinical": {
+        "functions": [
+          "舒筋活络",
+          "清热利湿"
+        ],
+        "indications": [
+          "腰痛",
+          "下肢痿痹",
+          "腹痛",
+          "小便不利"
+        ],
+        "needling_depth_cm": 1.0
+      },
+      "validation": {
+        "confidence_min": 0.7,
+        "grade": "A"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "BL60",
+      "name_cn": "昆仑",
+      "name_pinyin": "KunLun",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 26,
+        "landmark_distal": 28,
+        "ratio": 1.0,
+        "offset_direction": "posterior",
+        "offset_cun": 0,
+        "cun_per_segment": 16,
+        "description": "外踝尖与跟腱之间的凹陷中"
+      },
+      "clinical": {
+        "functions": [
+          "舒筋活络",
+          "安神止痛"
+        ],
+        "indications": [
+          "头痛",
+          "腰痛",
+          "踝关节扭伤",
+          "癫痫"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.7,
+        "grade": "A"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "GB30",
+      "name_cn": "环跳",
+      "name_pinyin": "HuanTiao",
+      "meridian": "足少阳胆经",
+      "meridian_code": "GB",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 24,
+        "landmark_distal": 26,
+        "ratio": 0.05,
+        "offset_direction": "lateral",
+        "offset_cun": 3.0,
+        "cun_per_segment": 19,
+        "description": "股骨大转子最凸点与骶管裂孔连线的外1/3与内2/3交点"
+      },
+      "clinical": {
+        "functions": [
+          "祛风湿",
+          "利腰腿"
+        ],
+        "indications": [
+          "腰痛",
+          "坐骨神经痛",
+          "下肢痿痹"
+        ],
+        "needling_depth_cm": 3.0
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "back"
+    },
+    {
+      "id": "LV3",
+      "name_cn": "太冲",
+      "name_pinyin": "TaiChong",
+      "meridian": "足厥阴肝经",
+      "meridian_code": "LR",
+      "location_rule": {
+        "method": "bone_proportion",
+        "landmark_proximal": 28,
+        "landmark_distal": 32,
+        "ratio": 0.3,
+        "offset_direction": "anterior",
+        "offset_cun": 0,
+        "cun_per_segment": 5,
+        "description": "第1、2跖骨结合部前方凹陷中，肝经原穴"
+      },
+      "clinical": {
+        "functions": [
+          "疏肝理气",
+          "平肝熄风",
+          "活血通络"
+        ],
+        "indications": [
+          "头痛",
+          "眩晕",
+          "月经不调",
+          "胁痛",
+          "高血压"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "A"
+      },
+      "valid_orientation": null
+    }
+  ],
+  "meridian_index": {
+    "LU": "手太阴肺经",
+    "LI": "手阳明大肠经",
+    "HT": "手少阴心经",
+    "SI": "手太阳小肠经",
+    "PC": "手厥阴心包经",
+    "TE": "手少阳三焦经",
+    "ST": "足阳明胃经",
+    "SP": "足太阴脾经",
+    "BL": "足太阳膀胱经",
+    "KI": "足少阴肾经",
+    "GB": "足少阳胆经",
+    "LR": "足厥阴肝经"
+  }
+}

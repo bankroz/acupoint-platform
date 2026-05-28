@@ -1,0 +1,305 @@
+{
+  "description": "面部穴位数据库 - 基于MediaPipe Holistic Face Mesh (468点)",
+  "region": "face",
+  "estimated_count": 18,
+  "notes": "需要Holistic模型支持，Pose-only模式下无法定位",
+  "face_mesh_indices_reference": {
+    "nose_tip": 4,
+    "left_eye_inner": 133,
+    "right_eye_inner": 362,
+    "left_eye_outer": 33,
+    "right_eye_outer": 263,
+    "mid_forehead": 10,
+    "mid_between_eyes": 168,
+    "philtrum": 13,
+    "left_nose_wing": 64,
+    "right_nose_wing": 294,
+    "left_mouth_corner": 61,
+    "right_mouth_corner": 291,
+    "left_temple": 162,
+    "right_temple": 389,
+    "left_ear_tragus": 234,
+    "right_ear_tragus": 454
+  },
+  "acupoints": [
+    {
+      "id": "GV29",
+      "name_cn": "印堂",
+      "name_pinyin": "YinTang",
+      "meridian": "经外奇穴(督脉)",
+      "meridian_code": "GV",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          168
+        ],
+        "description": "两眉头连线中点(印堂奇穴)"
+      },
+      "clinical": {
+        "functions": [
+          "安神定志",
+          "清头明目"
+        ],
+        "indications": [
+          "头痛",
+          "失眠",
+          "鼻塞",
+          "眩晕"
+        ],
+        "needling_depth_cm": 0.3
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "EX_HN5",
+      "name_cn": "太阳",
+      "name_pinyin": "TaiYang",
+      "meridian": "经外奇穴",
+      "meridian_code": "EX",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          162
+        ],
+        "description": "眉梢与目外眦之间向后约一横指凹陷中(左)"
+      },
+      "clinical": {
+        "functions": [
+          "疏风清热",
+          "清头明目"
+        ],
+        "indications": [
+          "头痛",
+          "目赤肿痛",
+          "面瘫"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "ST2",
+      "name_cn": "四白",
+      "name_pinyin": "SiBai",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          225
+        ],
+        "description": "目正视，瞳孔直下，眶下孔凹陷中"
+      },
+      "clinical": {
+        "functions": [
+          "明目通络",
+          "祛风止痛"
+        ],
+        "indications": [
+          "目赤肿痛",
+          "面瘫",
+          "三叉神经痛"
+        ],
+        "needling_depth_cm": 0.3
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "ST4",
+      "name_cn": "地仓",
+      "name_pinyin": "DiCang",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          61
+        ],
+        "description": "口角外侧旁开0.4寸(左)"
+      },
+      "clinical": {
+        "functions": [
+          "祛风通络"
+        ],
+        "indications": [
+          "面瘫",
+          "流涎",
+          "口角歪斜"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.6,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "ST7",
+      "name_cn": "下关",
+      "name_pinyin": "XiaGuan",
+      "meridian": "足阳明胃经",
+      "meridian_code": "ST",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          447
+        ],
+        "description": "颧弓下缘，下颌骨髁状突前方凹陷中"
+      },
+      "clinical": {
+        "functions": [
+          "疏风通络",
+          "聪耳利齿"
+        ],
+        "indications": [
+          "牙痛",
+          "面瘫",
+          "耳鸣",
+          "下颌关节炎"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "LI20",
+      "name_cn": "迎香",
+      "name_pinyin": "YingXiang",
+      "meridian": "手阳明大肠经",
+      "meridian_code": "LI",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          64
+        ],
+        "description": "鼻翼外缘中点旁开0.5寸，鼻唇沟中(左)"
+      },
+      "clinical": {
+        "functions": [
+          "通鼻窍",
+          "散风热"
+        ],
+        "indications": [
+          "鼻塞",
+          "鼻出血",
+          "面瘫"
+        ],
+        "needling_depth_cm": 0.3
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "SI18",
+      "name_cn": "颧髎",
+      "name_pinyin": "QuanLiao",
+      "meridian": "手太阳小肠经",
+      "meridian_code": "SI",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          188
+        ],
+        "description": "目外眦直下，颧骨下缘凹陷中(左)"
+      },
+      "clinical": {
+        "functions": [
+          "祛风通络"
+        ],
+        "indications": [
+          "面瘫",
+          "牙痛",
+          "三叉神经痛"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.4,
+        "grade": "C"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "BL2",
+      "name_cn": "攒竹",
+      "name_pinyin": "CuanZhu",
+      "meridian": "足太阳膀胱经",
+      "meridian_code": "BL",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          105
+        ],
+        "description": "眉头凹陷中，眶上切迹处(左)"
+      },
+      "clinical": {
+        "functions": [
+          "疏风清热",
+          "明目止痛"
+        ],
+        "indications": [
+          "头痛",
+          "目赤肿痛",
+          "眼睑跳动"
+        ],
+        "needling_depth_cm": 0.3
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    },
+    {
+      "id": "GV24",
+      "name_cn": "神庭",
+      "name_pinyin": "ShenTing",
+      "meridian": "督脉",
+      "meridian_code": "GV",
+      "location_rule": {
+        "method": "face_mesh",
+        "face_indices": [
+          10
+        ],
+        "description": "前发际正中直上0.5寸"
+      },
+      "clinical": {
+        "functions": [
+          "安神定志",
+          "清头明目"
+        ],
+        "indications": [
+          "头痛",
+          "失眠",
+          "眩晕"
+        ],
+        "needling_depth_cm": 0.5
+      },
+      "validation": {
+        "confidence_min": 0.5,
+        "grade": "B"
+      },
+      "valid_orientation": "front"
+    }
+  ]
+}

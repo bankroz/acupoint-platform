@@ -1,0 +1,117 @@
+# ============================================================
+# 穴位定位平台 - 统一配置文件
+# ============================================================
+
+project:
+  name: "MediaPipe Acupoint Platform"
+  version: "0.1.0"
+
+# ---- MediaPipe 模式选择 ----
+mediapipe:
+  # 模式: "pose" (仅33点骨架) | "holistic" (33骨架+468面部+21手部×2)
+  mode: "holistic"
+  # 模型复杂度: 0=轻量, 1=中等, 2=最精确
+  model_complexity: 2
+  # 最小检测置信度
+  min_detection_confidence: 0.7
+  min_tracking_confidence: 0.5
+  # 静态图片模式
+  static_image_mode: false
+
+# ---- 摄像头配置 ----
+camera:
+  device_id: 0
+  backend: "CAP_DSHOW"  # Windows推荐
+  width: 1280
+  height: 720
+  fps: 30
+
+# ---- 虚拟脊柱参数 ----
+spine:
+  # 脊柱S形曲线系数（插值权重）
+  cervical_lordosis: 0.15    # 颈椎前凸
+  thoracic_kyphosis: 0.35    # 胸椎后凸
+  lumbar_lordosis: 0.50      # 腰椎前凸
+  # 椎骨数量（C7+T12+L5 = 24节活动椎骨）
+  vertebrae_count: 24
+  # 体表投影偏移（脊柱到体表的距离比例）
+  surface_offset_ratio: 0.05
+
+# ---- 骨度分寸法基准 ----
+bone_cun:
+  # 1寸 = 身高/75（成人标准）
+  height_to_cun: 75.0
+  # 区域寸法（古代度量标准，单位：寸）
+  regions:
+    head_face: 12.0           # 前发际至后发际
+    chest_abdomen: 8.0         # 天突至歧骨
+    upper_abdomen: 8.0         # 歧骨至脐中
+    lower_abdomen: 5.0         # 脐中至耻骨
+    upper_back: 8.0            # 大椎至至阳（T7）
+    lower_back: 8.0            # 至阳至命门（L2）
+    lumbar: 5.0                # 命门至腰阳关（L4）
+    upper_arm: 9.0             # 腋前纹至肘横纹
+    forearm: 12.0              # 肘横纹至腕横纹
+    thigh: 19.0                # 股骨大转子至膝中
+    lower_leg: 16.0            # 膝中至外踝尖
+
+# ---- 人群适配默认系数 ----
+population:
+  default_adult:
+    ratio_modifier: 1.0
+    offset_modifier: 1.0
+  child_0_12:
+    ratio_modifier: 0.95
+    offset_modifier: 0.85
+  elderly_65plus:
+    ratio_modifier: 1.02
+    offset_modifier: 1.05
+  obese_bmi_30plus:
+    ratio_modifier: 1.0
+    offset_modifier: 1.3
+
+# ---- 穴位精度过滤 ----
+precision:
+  # 只显示指定精度等级以上的穴位: A/B/C/D
+  min_grade: "D"
+  # 置信度阈值
+  min_confidence: 0.5
+
+# ---- 3D可视化 ----
+visualization:
+  engine: "plotly"  # "plotly" | "open3d" | "matplotlib"
+  window_width: 1280
+  window_height: 800
+  show_bubbles: true
+  bubble_info:
+    - "name_cn"
+    - "meridian"
+    - "functions"
+    - "location_rule.description"
+  colors:
+    skeleton: "#808080"
+    acupoint_default: "#FF0000"
+    meridian_cv: "#FF6B35"     # 任脉
+    meridian_gv: "#FFD700"     # 督脉
+    meridian_bl: "#4169E1"     # 膀胱经
+    meridian_st: "#FF8C00"     # 胃经
+    meridian_sp: "#9932CC"     # 脾经
+    meridian_ki: "#00CED1"     # 肾经
+    meridian_lv: "#228B22"     # 肝经
+    meridian_lu: "#FFFFFF"     # 肺经
+
+# ---- 数据库 ----
+database:
+  type: "sqlite"
+  path: "database/acupoint.db"
+  json_sources:
+    - "database/acupoints_torso.json"
+    - "database/acupoints_limbs.json"
+    - "database/acupoints_face.json"
+    - "database/acupoints_hands.json"
+
+# ---- 路径 ----
+paths:
+  input_images: "input/images"
+  output_annotations: "output/annotations"
+  output_visualizations: "output/visualizations"

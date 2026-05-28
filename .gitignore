@@ -1,0 +1,46 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# === 模型文件（太大，通过 setup.bat 下载）===
+models/*.task
+models/*.tflite
+
+# === 虚拟环境 ===
+venv/
+.venv/
+env/
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === 运行时产物 ===
+output/screenshots/*
+output/visualizations/*
+output/annotations/*
+input/images/*
+
+# === 系统文件 ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Jupyter ===
+.ipynb_checkpoints/
+
+# === 保留目录结构 ===
+!input/images/.gitkeep
+!output/annotations/.gitkeep
+!output/visualizations/.gitkeep
+!output/screenshots/.gitkeep
+!models/.gitkeep
+!database/.gitkeep
